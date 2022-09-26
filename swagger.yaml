@@ -14,6 +14,13 @@ paths:
         - family_budget
       summary: Create a new family budget
       operationId: createFamilyBudget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/User'
       responses:
         '201':
           description: Created
@@ -48,7 +55,27 @@ paths:
           description: Budget not found
         '405':
           description: Not allowed
-          
+    put: # update
+      tags:
+        - family_budget
+      summary: Update an existing family budget
+      operationId: updateFamilyBudget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyBudget'
+        '405':
+          description: Not allowed
   /family_budget/{familyBudgetId}/report:
     parameters:
       - name: familyBudgetId
@@ -111,6 +138,19 @@ paths:
         - user
       summary: Create a new user
       operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                surname:
+                  type: string
+                  example: skip
+                name:
+                  type: string
+                  example: oleg
+              
       responses:
         '201':
           description: Created
@@ -255,4 +295,3 @@ components:
         money_amount:
           type: integer
           example: 0
-          
