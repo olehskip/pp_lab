@@ -1,0 +1,258 @@
+openapi: 3.0.3
+info:
+  title: Family budget API
+  version: 1.0.0
+tags:
+  - name: family_budget
+    description: Everything about family budgets
+  - name: user
+    description: Everything about users
+paths:
+  /family_budget:
+    post:
+      tags:
+        - family_budget
+      summary: Create a new family budget
+      operationId: createFamilyBudget
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyBudget'
+        '400':
+          description: Bad request
+
+  /family_budget/{familyBudgetId}:
+    parameters:
+      - name: familyBudgetId
+        in: path
+        description: The budget's id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: # get budget
+        - family_budget
+      summary: Get an existing family bugdet
+      operationId: getFamilyBudget
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyBudget'
+        '404':
+          description: Budget not found
+        '405':
+          description: Not allowed
+          
+  /family_budget/{familyBudgetId}/report:
+    parameters:
+      - name: familyBudgetId
+        in: path
+        description: The family budget's id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: # get family budget report
+        - family_budget
+      summary: Get family budget report
+      operationId: getFamilyBudgetReport
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetReport'
+        '404':
+          description: Budget not found
+          
+  /family_budget/{familyBudgetId}/transfer:
+    parameters:
+      - name: familyBudgetId
+        in: path
+        description: The family budget's id
+        required: true
+        schema:
+          type: integer
+      - name: BudgetId
+        in: query
+        description: The budget's id
+        required: true
+        schema:
+          type: integer
+      - name: moneyAmount
+        in: query
+        description: money amount
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+        - family_budget
+      summary: Tranfser money from the family bugdet to some budget
+      operationId: transferFromFamilyBudget
+      responses:
+        '200':
+            description: OK
+        '404':
+          description: Budget not found
+        '405':
+          description: Not allowed
+  
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create a new user
+      operationId: createUser
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+        '405':
+          description: Not allowed
+
+  /user/{UserId}:
+    parameters:
+      - name: UserId
+        in: path
+        description: The user's id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - user
+      summary: Get an existing personal bugdet
+      operationId: getUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Budget not found
+        '400':
+          description: Bad request
+          
+  /user/{UserId}/report:
+    parameters:
+      - name: UserId
+        in: path
+        description: The user's id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - user
+      summary: Get user budget report
+      operationId: getUserId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetReport'
+        '404':
+          description: User not found
+          
+  /user/{UserId}/transfer:
+    parameters:
+      - name: UserId
+        in: path
+        description: The user's id
+        required: true
+        schema:
+          type: integer
+      - name: budgetId
+        in: query
+        description: The budget's id
+        required: true
+        schema:
+          type: integer
+      - name: moneyAmount
+        in: query
+        description: The family budget's id
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+        - user
+      summary: Tranfser money from the personal bugdet to some budget
+      operationId: transferFromUser
+      responses:
+        '200':
+            description: OK
+        '404':
+          description: Budget not found
+        '405':
+            description: Not allowed
+      
+components:
+  schemas:
+    FamilyBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        total_money_amount:
+          type: integer
+          example: 0
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      
+    BudgetReport:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoneyOperation'
+          
+    MoneyOperation:
+      type: object
+      properties:
+        sender:
+          $ref: '#/components/schemas/User'
+        time:
+          type: string # date-time
+          example: "1/09/2022 19:36:30"
+        money_amount:
+          type: integer
+          example: 1 # plus if income, minus if outcome
+            
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        surname:
+          type: string
+          example: "Dungeon"
+        name:
+          type: string
+          example: "Master"
+        money_amount:
+          type: integer
+          example: 0
+          
