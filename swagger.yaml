@@ -5,6 +5,8 @@ info:
 tags:
   - name: family_budget
     description: Everything about family budgets
+  - name: personal_budget
+    description: Everything about personal budgets
   - name: user
     description: Everything about users
 paths:
@@ -14,13 +16,16 @@ paths:
         - family_budget
       summary: Create a new family budget
       operationId: createFamilyBudget
+      security:
+        - api_key: []
+        - auth: [user]
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items: 
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/FamilyBudget'
       responses:
         '201':
           description: Created
@@ -30,6 +35,10 @@ paths:
                 $ref: '#/components/schemas/FamilyBudget'
         '400':
           description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
 
   /family_budget/{familyBudgetId}:
     parameters:
@@ -44,6 +53,9 @@ paths:
         - family_budget
       summary: Get an existing family bugdet
       operationId: getFamilyBudget
+      security:
+        - api_key: []
+        - auth: [user]
       responses:
         '200':
           description: OK
@@ -53,29 +65,53 @@ paths:
                 $ref: '#/components/schemas/FamilyBudget'
         '404':
           description: Budget not found
-        '405':
-          description: Not allowed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
     put: # update
       tags:
         - family_budget
       summary: Update an existing family budget
       operationId: updateFamilyBudget
+      security:
+        - api_key: []
+        - auth: [user]
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items: 
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/FamilyBudget'
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FamilyBudget'
-        '405':
-          description: Not allowed
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    delete:
+      tags:
+        - family_budget
+      summary: Delete an existing family budget
+      operationId: deleteFamilyBudget
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      
+          
   /family_budget/{familyBudgetId}/report:
     parameters:
       - name: familyBudgetId
@@ -89,6 +125,9 @@ paths:
         - family_budget
       summary: Get family budget report
       operationId: getFamilyBudgetReport
+      security:
+        - api_key: []
+        - auth: [user]
       responses:
         '200':
           description: OK
@@ -98,6 +137,10 @@ paths:
                 $ref: '#/components/schemas/BudgetReport'
         '404':
           description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
           
   /family_budget/{familyBudgetId}/transfer:
     parameters:
@@ -124,13 +167,151 @@ paths:
         - family_budget
       summary: Tranfser money from the family bugdet to some budget
       operationId: transferFromFamilyBudget
+      security:
+        - api_key: []
+        - auth: [user]
       responses:
         '200':
             description: OK
         '404':
           description: Budget not found
-        '405':
-          description: Not allowed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  
+  /personalBudget/{BudgetId}:
+    parameters:
+      - name: BudgetId
+        in: path
+        description: The budget's id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: # get budget
+        - personal_budget
+      summary: Get an existing personal bugdet
+      operationId: getPersonalBudget
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalBudget'
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    put: # update
+      tags:
+        - personal_budget
+      summary: Update a personal budget
+      operationId: updatePersonalBudget
+      security:
+        - api_key: []
+        - auth: [user]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/PersonalBudget'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    delete:
+      tags:
+        - personal_budget
+      summary: Delete an existing personal budget
+      operationId: deleteBudget
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  
+  /personal_budget/{BudgetId}/report:
+    parameters:
+      - name: BudgetId
+        in: path
+        description: The user's budget id
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - personal_budget
+      summary: Get personal report
+      operationId: getPersonalBudgetReport
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetReport'
+        '404':
+          description: User not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+          
+  /personal_budget/{BudgetId}/transfer:
+    parameters:
+      - name: BudgetId
+        in: path
+        description: The budget's id
+        required: true
+        schema:
+          type: integer
+      - name: receiverBudgetId
+        in: query
+        description: The receiver budget's id
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+        - personal_budget
+      summary: Tranfser money from the personal bugdet to some budget
+      operationId: transferFromUser
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+            description: OK
+        '404':
+          description: Budget not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   
   /user:
     post:
@@ -146,10 +327,16 @@ paths:
               properties:
                 surname:
                   type: string
-                  example: skip
+                  example: dungeon
                 name:
                   type: string
-                  example: oleg
+                  example: master
+                string:
+                  type: string
+                  example: dungeonmaster
+                password:
+                  type: string
+                  example: van
               
       responses:
         '201':
@@ -160,8 +347,6 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: Bad request
-        '405':
-          description: Not allowed
 
   /user/{UserId}:
     parameters:
@@ -171,11 +356,15 @@ paths:
         required: true
         schema:
           type: integer
+        
     get:
       tags:
         - user
-      summary: Get an existing personal bugdet
+      summary: Get an user
       operationId: getUser
+      security:
+        - api_key: []
+        - auth: [user]
       responses:
         '200':
           description: OK
@@ -187,62 +376,115 @@ paths:
           description: Budget not found
         '400':
           description: Bad request
-          
-  /user/{UserId}/report:
-    parameters:
-      - name: UserId
-        in: path
-        description: The user's id
-        required: true
-        schema:
-          type: integer
-    get:
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    put: # update
       tags:
         - user
-      summary: Get user budget report
-      operationId: getUserId
+      summary: Update an existing user
+      operationId: updateUser
+      security:
+        - api_key: []
+        - auth: [user]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/User'
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BudgetReport'
-        '404':
-          description: User not found
-          
-  /user/{UserId}/transfer:
-    parameters:
-      - name: UserId
-        in: path
-        description: The user's id
-        required: true
-        schema:
-          type: integer
-      - name: budgetId
-        in: query
-        description: The budget's id
-        required: true
-        schema:
-          type: integer
-      - name: moneyAmount
-        in: query
-        description: The family budget's id
-        required: true
-        schema:
-          type: integer
-    post:
-      tags:
-        - user
-      summary: Tranfser money from the personal bugdet to some budget
-      operationId: transferFromUser
-      responses:
-        '200':
-            description: OK
         '404':
           description: Budget not found
-        '405':
-            description: Not allowed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    delete:
+      tags:
+        - user
+      summary: Delete an user
+      operationId: deleteUser
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Budget not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+          
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+          
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      security:
+        - api_key: []
+        - auth: [user]
+      responses:
+        '200':
+          description: successful operation
+        '401':
+          description: Unauthorized
+        
       
 components:
   schemas:
@@ -259,6 +501,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    
+    PersonalBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        money_amount:
+          type: integer
+          example: 0
+        owner:
+          $ref: '#/components/schemas/User'
       
     BudgetReport:
       type: object
@@ -271,6 +525,9 @@ components:
     MoneyOperation:
       type: object
       properties:
+        budget_id:
+          type: integer
+          example: 231
         sender:
           $ref: '#/components/schemas/User'
         time:
@@ -292,6 +549,22 @@ components:
         name:
           type: string
           example: "Master"
-        money_amount:
-          type: integer
-          example: 0
+        personal_budget:
+          $ref: "#/components/schemas/PersonalBudget"
+        family_budgets_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/FamilyBudget"
+          
+  securitySchemes:
+    auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            user: manage budgets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
