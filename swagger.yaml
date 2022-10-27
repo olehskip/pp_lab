@@ -17,8 +17,8 @@ paths:
       summary: Create a new family budget
       operationId: createFamilyBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       requestBody:
         content:
           application/json:
@@ -26,6 +26,7 @@ paths:
               type: array
               items: 
                 $ref: '#/components/schemas/FamilyBudget'
+                # FamilyBudget.id is not required, if it presents then 400 response
       responses:
         '201':
           description: Created
@@ -49,13 +50,13 @@ paths:
         schema:
           type: integer
     get:
-      tags: # get budget
+      tags:
         - family_budget
       summary: Get an existing family bugdet
       operationId: getFamilyBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       responses:
         '200':
           description: OK
@@ -69,14 +70,14 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    put: # update
+    post:
       tags:
         - family_budget
       summary: Update an existing family budget
       operationId: updateFamilyBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       requestBody:
         content:
           application/json:
@@ -84,6 +85,7 @@ paths:
               type: array
               items: 
                 $ref: '#/components/schemas/FamilyBudget'
+                # FamilyBudget.id is not required, if it presents then 400 response
       responses:
         '200':
           description: OK
@@ -99,8 +101,8 @@ paths:
       summary: Delete an existing family budget
       operationId: deleteFamilyBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
           description: OK
@@ -121,13 +123,13 @@ paths:
         schema:
           type: integer
     get:
-      tags: # get family budget report
+      tags:
         - family_budget
       summary: Get family budget report
       operationId: getFamilyBudgetReport
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
           description: OK
@@ -150,26 +152,27 @@ paths:
         required: true
         schema:
           type: integer
-      - name: BudgetId
-        in: query
-        description: The budget's id
-        required: true
-        schema:
-          type: integer
-      - name: moneyAmount
-        in: query
-        description: money amount
-        required: true
-        schema:
-          type: integer
     post:
       tags:
         - family_budget
       summary: Tranfser money from the family bugdet to some budget
       operationId: transferFromFamilyBudget
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                type: object
+                properties:
+                  receiver:
+                    $ref: '#/components/schemas/Budget'
+                  moneyAmount:
+                    type: integer
+                    minimum: 1
+                    example: 223
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
             description: OK
@@ -194,8 +197,8 @@ paths:
       summary: Get an existing personal bugdet
       operationId: getPersonalBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       responses:
         '200':
           description: OK
@@ -209,14 +212,14 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    put: # update
+    post: # update
       tags:
         - personal_budget
       summary: Update a personal budget
       operationId: updatePersonalBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       requestBody:
         content:
           application/json:
@@ -224,9 +227,12 @@ paths:
               type: array
               items: 
                 $ref: '#/components/schemas/PersonalBudget'
+                # If PersonalBudget.id presents and it doesn't equal to BudgetId paramater then 400 response
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad request
         '404':
           description: Budget not found
         '401':
@@ -239,8 +245,8 @@ paths:
       summary: Delete an existing personal budget
       operationId: deleteBudget
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       responses:
         '200':
           description: OK
@@ -265,8 +271,8 @@ paths:
       summary: Get personal report
       operationId: getPersonalBudgetReport
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
           description: OK
@@ -289,20 +295,27 @@ paths:
         required: true
         schema:
           type: integer
-      - name: receiverBudgetId
-        in: query
-        description: The receiver budget's id
-        required: true
-        schema:
-          type: integer
     post:
       tags:
         - personal_budget
       summary: Tranfser money from the personal bugdet to some budget
       operationId: transferFromUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                type: object
+                properties:
+                  receiver:
+                    $ref: '#/components/schemas/Budget'
+                  moneyAmount:
+                    type: integer
+                    minimum: 1
+                    example: 223
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
             description: OK
@@ -363,8 +376,8 @@ paths:
       summary: Get an user
       operationId: getUser
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       responses:
         '200':
           description: OK
@@ -380,14 +393,14 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    put: # update
+    post:
       tags:
         - user
       summary: Update an existing user
       operationId: updateUser
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       requestBody:
         content:
           application/json:
@@ -395,6 +408,7 @@ paths:
               type: array
               items: 
                 $ref: '#/components/schemas/User'
+                # If UserId.id presents and it doesn't equal to UserId paramater then 400 response
       responses:
         '200':
           description: OK
@@ -410,8 +424,8 @@ paths:
       summary: Delete an user
       operationId: deleteUser
       security:
-        - api_key: []
-        - auth: [user]
+        - auth: 
+          - user
       responses:
         '200':
           description: OK
@@ -475,10 +489,9 @@ paths:
       summary: Logs out current logged in user session
       description: ''
       operationId: logoutUser
-      parameters: []
       security:
-        - api_key: []
-        - auth: [user]
+        - auth:
+          - user
       responses:
         '200':
           description: successful operation
@@ -490,10 +503,14 @@ components:
   schemas:
     FamilyBudget:
       type: object
+      required:
+        - total_money_amount
+        - members
       properties:
         id:
           type: integer
           example: 1
+          minimum: 1
         total_money_amount:
           type: integer
           example: 0
@@ -504,10 +521,14 @@ components:
     
     PersonalBudget:
       type: object
+      required:
+        - money_amount
+        - owner
       properties:
         id:
           type: integer
           example: 1
+          minimum: 1
         money_amount:
           type: integer
           example: 0
@@ -516,20 +537,40 @@ components:
       
     BudgetReport:
       type: object
+      required:
+        - operations
       properties:
         operations:
           type: array
           items:
             $ref: '#/components/schemas/MoneyOperation'
-          
-    MoneyOperation:
+    
+    Budget:
       type: object
+      required:
+        - Budget
       properties:
+        budget_type:
+          enum: [personal, family]
         budget_id:
           type: integer
-          example: 231
+          example: 1
+    
+    MoneyOperation:
+      type: object
+      required:
+        - budget
+        - sender
+        - receiver
+        - time
+        - money_amount
+      properties:
+        budget:
+          $ref: '#/components/schemas/Budget'
         sender:
           $ref: '#/components/schemas/User'
+        receiver:
+          $ref: '#/components/schemas/Budget'
         time:
           type: string # date-time
           example: "1/09/2022 19:36:30"
@@ -539,6 +580,11 @@ components:
             
     User:
       type: object
+      required:
+        - surname
+        - name
+        - personal_budget
+        - family_budgets
       properties:
         id:
           type: integer
@@ -551,7 +597,7 @@ components:
           example: "Master"
         personal_budget:
           $ref: "#/components/schemas/PersonalBudget"
-        family_budgets_ids:
+        family_budgets:
           type: array
           items:
             $ref: "#/components/schemas/FamilyBudget"
@@ -564,7 +610,3 @@ components:
           authorizationUrl: https://petstore3.swagger.io/oauth/authorize
           scopes:
             user: manage budgets
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
