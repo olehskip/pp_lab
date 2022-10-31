@@ -25,7 +25,7 @@ paths:
             schema:
               type: array
               items: 
-                $ref: '#/components/schemas/FamilyBudget'
+                type: integer
                 # FamilyBudget.id is not required, if it presents then 400 response
       responses:
         '201':
@@ -40,6 +40,10 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: Datbase error, failed to add family budget
+        '406':
+          description: Datbase error, failed to add family member  
 
   /family_budget/{familyBudgetId}:
     parameters:
@@ -70,10 +74,10 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    post:
+    patch:
       tags:
         - family_budget
-      summary: Update an existing family budget
+      summary: Update an existing family budget, could be realised later
       operationId: updateFamilyBudget
       security:
         - auth: 
@@ -112,6 +116,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: Database error
       
           
   /family_budget/{familyBudgetId}/report:
@@ -143,6 +149,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: This budget has no operations
           
   /family_budget/{familyBudgetId}/transfer:
     parameters:
@@ -164,8 +172,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  receiver:
-                    $ref: '#/components/schemas/Budget'
+                  receiver_budget_id:
+                    type: integer
+                    example: 1
+                  receiver_type:
+                    type: string
+                    example: "personal"
                   moneyAmount:
                     type: integer
                     minimum: 1
@@ -182,6 +194,14 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: Failed to execute operation, database error
+        '406':
+          description: Not enough money
+        '407':
+          description: Money amount couldn`t be less than 0.1
+        '408':
+          description: Receiving budget doesn`t exist  
   
   /personalBudget/{BudgetId}:
     parameters:
@@ -212,50 +232,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    post: # update
-      tags:
-        - personal_budget
-      summary: Update a personal budget
-      operationId: updatePersonalBudget
-      security:
-        - auth: 
-          - user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items: 
-                $ref: '#/components/schemas/PersonalBudget'
-                # If PersonalBudget.id presents and it doesn't equal to BudgetId paramater then 400 response
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Bad request
-        '404':
-          description: Budget not found
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-    delete:
-      tags:
-        - personal_budget
-      summary: Delete an existing personal budget
-      operationId: deleteBudget
-      security:
-        - auth: 
-          - user
-      responses:
-        '200':
-          description: OK
-        '404':
-          description: Budget not found
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
+        '405':
+          description: Failed to execute operation, database error
+        '406':
+          description: Not enough money
+        '407':
+          description: Money amount couldn`t be less than 0.1
   
   /personal_budget/{BudgetId}/report:
     parameters:
@@ -286,6 +268,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: This budget has no operations
           
   /personal_budget/{BudgetId}/transfer:
     parameters:
@@ -307,8 +291,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  receiver:
-                    $ref: '#/components/schemas/Budget'
+                  receiver_budget_id:
+                    type: integer
+                    example: 1
+                  receiver_type:
+                    type: string
+                    example: "personal"
                   moneyAmount:
                     type: integer
                     minimum: 1
@@ -325,6 +313,14 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '405':
+          description: Failed to execute operation, database error
+        '406':
+          description: Not enough money
+        '407':
+          description: Money amount couldn`t be less than 0.1
+        '408':
+          description: Receiving budget doesn`t exist
   
   /user:
     post:
@@ -360,6 +356,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: Bad request
+        '401':
+          description: User already exists
+        '405':
+          description: Failed to create personal budget, database error
 
   /user/{UserId}:
     parameters:
@@ -393,7 +393,7 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-    post:
+    patch:
       tags:
         - user
       summary: Update an existing user
@@ -413,7 +413,7 @@ paths:
         '200':
           description: OK
         '404':
-          description: Budget not found
+          description: User not found
         '401':
           description: Unauthorized
         '403':
@@ -421,7 +421,7 @@ paths:
     delete:
       tags:
         - user
-      summary: Delete an user
+      summary: Delete an user and his personal budget
       operationId: deleteUser
       security:
         - auth: 
@@ -559,18 +559,25 @@ components:
     MoneyOperation:
       type: object
       required:
-        - budget
-        - sender
-        - receiver
+        - sender_budget_id
+        - receiver_budget_id
+        - sender_type
+        - receiver_type
         - time
         - money_amount
       properties:
-        budget:
-          $ref: '#/components/schemas/Budget'
-        sender:
-          $ref: '#/components/schemas/User'
-        receiver:
-          $ref: '#/components/schemas/Budget'
+        sender_budget_id:
+          type: integer
+          example: 1
+        receiver_budget_id:
+          type: integer
+          example: 1
+        sender_type:
+          type: string
+          example: "family"
+        receiver_type:
+          type: string
+          example: "personal"
         time:
           type: string # date-time
           example: "1/09/2022 19:36:30"
