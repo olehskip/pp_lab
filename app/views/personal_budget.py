@@ -1,39 +1,44 @@
 from marshmallow import Schema, fields, ValidationError
-#from marshmallow_enum import EnumField
 from datetime import datetime
 from enum import Enum
 from flask import Blueprint, jsonify, request
 import app.models as models
 import app.db as db
 from flask_bcrypt import Bcrypt
+from app.auth import auth
 
-PersonalBudgets_blueprint = Blueprint('PersonalBudgets', __name__, url_prefix='/PersonalBudgets')
+personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/personal_budget')
 bcrypt = Bcrypt()
 
-def from_Personal_model_to_json(personalBudget: models.PersonalBudgets):
-	PersonalBudgets_json = {}
+def from_personal_model_to_json(personal_budget: models.PersonalBudgets):
+	personal_budgets_json = {}
 	
-	PersonalBudgets_json['id'] = personalBudget.id
-	PersonalBudgets_json['money_amount'] = personalBudget.money_amount
+	personal_budgets_json['id'] = personal_budget.id
+	personal_budgets_json['money_amount'] = personal_budget.money_amount
 		
-	return jsonify(PersonalBudgets_json)
+	return jsonify(personal_budgets_json)
 
-@PersonalBudgets_blueprint.route('/<int:personalBudget_id>', methods=['GET'])
-def get_personal_budget(personalBudget_id):
-	personalBudget = db.session.query(models.PersonalBudgets).filter_by(id=personalBudget_id).first()
-	if personalBudget is None:
+@personal_budgets_blieprint.route('/<int:personal_budget_id>', methods=['GET'])
+@auth.login_required
+def get_personal_budget(personal_budget_id):
+	if personal_budget_id != auth.current_user().id:
+		return jsonify({'error': 'Unauthorized access'}), 401
+	
+	personal_budget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
+
+	if personal_budget is None:
 		return jsonify({'error': 'Budget not found'}), 404
 
-	return from_Personal_model_to_json(personalBudget), 200
+	return from_personal_model_to_json(personal_budget), 200
 	
-@PersonalBudgets_blueprint.route('/<int:personalBudget_id>/report', methods=['GET'])
-def get_personalBudget_report(personalBudget_id):
-	user = db.session.query(models.Users).filter_by(id=personalBudget_id).first()
-	if user is None:
-		return jsonify({'error': 'User not found'}), 404
-		
-	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==personalBudget_id and models.Operation.sender_type=="personal").all()
-	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==personalBudget_id and receiver_type=="personal").all()
+@personal_budgets_blieprint.route('/<int:personal_budget_id>/report', methods=['GET'])
+@auth.login_required
+def get_personal_budget_report(personal_budget_id):
+	if personal_budget_id != auth.current_user().id:
+		return jsonify({'error': 'Unauthorized access'}), 401
+
+	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==personal_budget_id and models.Operation.sender_type=="personal").all()
+	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==personal_budget_id and models.Operation.receiver_type=="personal").all()
 	if report1 is None and report2 is None:
 		return jsonify({'error': 'This budget has no operations'}), 405
 		
@@ -66,9 +71,13 @@ def get_personalBudget_report(personalBudget_id):
 		
 	return jsonify(report_json), 200
 	
-@PersonalBudgets_blueprint.route('/<int:personalBudget_id>/transfer', methods=['POST'])
-def post_personalBudget_transfer(personalBudget_id):
-	personalBudget = db.session.query(models.PersonalBudgets).filter_by(id=personalBudget_id).first()
+@personal_budgets_blieprint.route('/<int:personal_budget_id>/transfer', methods=['POST'])
+@auth.login_required
+def post_personal_budget_transfer(personal_budget_id):
+	if personal_budget_id != auth.current_user().id:
+		return jsonify({'error': 'Unauthorized access'}), 401
+
+	personalBudget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 	if personalBudget is None:
 		return jsonify({'error': 'User not found'}), 404
 		
@@ -85,13 +94,13 @@ def post_personalBudget_transfer(personalBudget_id):
 		return jsonify(err.messages), 400
 		
 	if request.json['money_amount'] < 0.1:
-		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 407
+		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 400
 	
 	if personalBudget.money_amount < request.json['money_amount']:
-		return jsonify({'error': 'Not enough money'}), 406
+		return jsonify({'error': 'Not enough money'}), 400
 	
 	now = datetime.now()
-	operation = models.Operation(sender_id=personalBudget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
+	operation = models.Operation(sender_id=personal_budget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
 	
 	try:
 		db.session.add(operation)
@@ -126,12 +135,4 @@ def post_personalBudget_transfer(personalBudget_id):
 	operation_json['date'] = operation.date
 	
 	return jsonify(operation_json), 200
-	
-	
-		
-	
-		
-	
-	
-
 
