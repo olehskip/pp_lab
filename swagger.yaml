@@ -181,7 +181,7 @@ paths:
                   receiver_type:
                     type: string
                     example: "personal"
-                  moneyAmount:
+                  money_amount:
                     type: integer
                     minimum: 1
                     example: 223
