@@ -17,16 +17,19 @@ paths:
       summary: Create a new family budget
       operationId: createFamilyBudget
       security:
-        - auth: 
+        - auth:
           - user
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items: 
-                type: integer
-                # FamilyBudget.id is not required, if it presents then 400 response
+              type: object
+              properties:
+                members_ids:
+                  type: array
+                  items:
+                    type: integer
+                    example: 1
       responses:
         '201':
           description: Created
@@ -43,11 +46,11 @@ paths:
         '405':
           description: Datbase error, failed to add family budget
         '406':
-          description: Datbase error, failed to add family member  
+          description: Datbase error, failed to add family member
 
-  /family_budget/{familyBudgetId}:
+  /family_budget/{family_budget_id}:
     parameters:
-      - name: familyBudgetId
+      - name: family_budget_id
         in: path
         description: The budget's id
         required: true
@@ -59,7 +62,7 @@ paths:
       summary: Get an existing family bugdet
       operationId: getFamilyBudget
       security:
-        - auth: 
+        - auth:
           - user
       responses:
         '200':
@@ -80,14 +83,14 @@ paths:
       summary: Update an existing family budget, could be realised later
       operationId: updateFamilyBudget
       security:
-        - auth: 
+        - auth:
           - user
       requestBody:
         content:
           application/json:
             schema:
               type: array
-              items: 
+              items:
                 $ref: '#/components/schemas/FamilyBudget'
                 # FamilyBudget.id is not required, if it presents then 400 response
       responses:
@@ -118,11 +121,11 @@ paths:
           description: Forbidden
         '405':
           description: Database error
-      
-          
-  /family_budget/{familyBudgetId}/report:
+
+
+  /family_budget/{family_budget_id}/report:
     parameters:
-      - name: familyBudgetId
+      - name: family_budget_id
         in: path
         description: The family budget's id
         required: true
@@ -151,10 +154,10 @@ paths:
           description: Forbidden
         '405':
           description: This budget has no operations
-          
-  /family_budget/{familyBudgetId}/transfer:
+
+  /family_budget/{family_budget_id}/transfer:
     parameters:
-      - name: familyBudgetId
+      - name: family_budget_id
         in: path
         description: The family budget's id
         required: true
@@ -178,7 +181,7 @@ paths:
                   receiver_type:
                     type: string
                     example: "personal"
-                  moneyAmount:
+                  money_amount:
                     type: integer
                     minimum: 1
                     example: 223
@@ -201,11 +204,11 @@ paths:
         '407':
           description: Money amount couldn`t be less than 0.1
         '408':
-          description: Receiving budget doesn`t exist  
-  
-  /personalBudget/{BudgetId}:
+          description: Receiving budget doesn`t exist
+
+  /personalBudget/{budget_id}:
     parameters:
-      - name: BudgetId
+      - name: budget_id
         in: path
         description: The budget's id
         required: true
@@ -217,7 +220,7 @@ paths:
       summary: Get an existing personal bugdet
       operationId: getPersonalBudget
       security:
-        - auth: 
+        - auth:
           - user
       responses:
         '200':
@@ -238,10 +241,10 @@ paths:
           description: Not enough money
         '407':
           description: Money amount couldn`t be less than 0.1
-  
-  /personal_budget/{BudgetId}/report:
+
+  /personal_budget/{budget_id}/report:
     parameters:
-      - name: BudgetId
+      - name: budget_id
         in: path
         description: The user's budget id
         required: true
@@ -270,10 +273,10 @@ paths:
           description: Forbidden
         '405':
           description: This budget has no operations
-          
-  /personal_budget/{BudgetId}/transfer:
+
+  /personal_budget/{budget_id}/transfer:
     parameters:
-      - name: BudgetId
+      - name: budget_id
         in: path
         description: The budget's id
         required: true
@@ -291,12 +294,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  receiver_budget_id:
-                    type: integer
-                    example: 1
-                  receiver_type:
-                    type: string
-                    example: "personal"
+                  receiver:
+                    $ref: '#/components/schemas/Budget'
                   moneyAmount:
                     type: integer
                     minimum: 1
@@ -321,7 +320,7 @@ paths:
           description: Money amount couldn`t be less than 0.1
         '408':
           description: Receiving budget doesn`t exist
-  
+
   /user:
     post:
       tags:
@@ -340,13 +339,13 @@ paths:
                 name:
                   type: string
                   example: master
-                string:
+                username:
                   type: string
                   example: dungeonmaster
                 password:
                   type: string
                   example: van
-              
+
       responses:
         '201':
           description: Created
@@ -361,22 +360,22 @@ paths:
         '405':
           description: Failed to create personal budget, database error
 
-  /user/{UserId}:
+  /user/{user_id}:
     parameters:
-      - name: UserId
+      - name: user_id
         in: path
         description: The user's id
         required: true
         schema:
           type: integer
-        
+
     get:
       tags:
         - user
       summary: Get an user
       operationId: getUser
       security:
-        - auth: 
+        - auth:
           - user
       responses:
         '200':
@@ -399,16 +398,16 @@ paths:
       summary: Update an existing user
       operationId: updateUser
       security:
-        - auth: 
+        - auth:
           - user
       requestBody:
         content:
           application/json:
             schema:
               type: array
-              items: 
+              items:
                 $ref: '#/components/schemas/User'
-                # If UserId.id presents and it doesn't equal to UserId paramater then 400 response
+                # If user_id.id presents and it doesn't equal to user_id paramater then 400 response
       responses:
         '200':
           description: OK
@@ -424,7 +423,7 @@ paths:
       summary: Delete an user and his personal budget
       operationId: deleteUser
       security:
-        - auth: 
+        - auth:
           - user
       responses:
         '200':
@@ -437,7 +436,7 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-          
+
   /user/login:
     get:
       tags:
@@ -481,7 +480,7 @@ paths:
                 type: string
         '400':
           description: Invalid username/password supplied
-          
+
   /user/logout:
     get:
       tags:
@@ -497,8 +496,8 @@ paths:
           description: successful operation
         '401':
           description: Unauthorized
-        
-      
+
+
 components:
   schemas:
     FamilyBudget:
@@ -518,7 +517,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
-    
+
     PersonalBudget:
       type: object
       required:
@@ -534,7 +533,7 @@ components:
           example: 0
         owner:
           $ref: '#/components/schemas/User'
-      
+
     BudgetReport:
       type: object
       required:
@@ -544,7 +543,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MoneyOperation'
-    
+
     Budget:
       type: object
       required:
@@ -555,7 +554,7 @@ components:
         budget_id:
           type: integer
           example: 1
-    
+
     MoneyOperation:
       type: object
       required:
@@ -566,25 +565,17 @@ components:
         - time
         - money_amount
       properties:
-        sender_budget_id:
-          type: integer
-          example: 1
-        receiver_budget_id:
-          type: integer
-          example: 1
-        sender_type:
-          type: string
-          example: "family"
-        receiver_type:
-          type: string
-          example: "personal"
+        sender:
+          $ref: '#/components/schemas/Budget'
+        receiver:
+          $ref: '#/components/schemas/Budget'
         time:
           type: string # date-time
           example: "1/09/2022 19:36:30"
         money_amount:
           type: integer
           example: 1 # plus if income, minus if outcome
-            
+
     User:
       type: object
       required:
@@ -608,7 +599,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FamilyBudget"
-          
+
   securitySchemes:
     auth:
       type: oauth2

@@ -1,40 +1,42 @@
 from marshmallow import Schema, fields, ValidationError
-#from marshmallow_enum import EnumField
 from datetime import datetime
-from enum import Enum
 from flask import Blueprint, jsonify, request
 import app.models as models
 import app.db as db
 from flask_bcrypt import Bcrypt
+from app.auth import auth
 
-FamilyBudgets_blueprint = Blueprint('FamilyBudgets', __name__, url_prefix='/FamilyBudgets')
+family_budgets_blieprint = Blueprint('FamilyBudgets', __name__, url_prefix='/family_budget')
 bcrypt = Bcrypt()
 
-@FamilyBudgets_blueprint.route('/', methods=['POST'])
+@family_budgets_blieprint.route('/', methods=['POST'])
+@auth.login_required
 def create_new_familyBudget():
-	class members_ids_class(Schema):
-		member_ids = fields.List(fields.Int(), required=True)	
+	class MembersIds(Schema):
+		members_ids = fields.List(fields.Int(), required=True)
 		
-	members_ids_class().load(request.json)	
 	try:
 		if not request.json:
 			raise ValidationError('No input data provided')
-		members_ids_class().load(request.json)
+		MembersIds().load(request.json)
 	except ValidationError as err:
 		return jsonify(err.messages), 400
 		
-	familyBudget = models.FamilyBudgets(money_amount=0)
+	family_budget = models.FamilyBudgets()
 	try:
-		db.session.add(familyBudget)
+		db.session.add(family_budget)
 	except:
 		db.session.rollback()
 		return jsonify({"Datbase error, failed to add family budget"}), 405
 	db.session.commit()
-		
-	for member_id in request.json['member_ids']:
-		familyBudgetUser = models.FamilyBudgetsUsers(family_budget_id=familyBudget.id, user_id=member_id)
+	
+	if auth.current_user().id not in request.json['members_ids']:
+		request.json['members_ids'].append(auth.current_user().id)
+
+	for members_ids in request.json['members_ids']:
+		family_budget_user = models.FamilyBudgetsUsers(family_budget_id=family_budget.id, user_id=members_ids)
 		try:
-			db.session.add(familyBudgetUser)
+			db.session.add(family_budget_user)
 		except:
 			db.session.rollback()
 			return jsonify({"Datbase error, failed to add family member"}), 406
@@ -42,20 +44,25 @@ def create_new_familyBudget():
 	
 	familyBudget_json = {}
 	
-	familyBudget_json['id'] = familyBudget.id
-	familyBudget_json['money_amount'] = familyBudget.money_amount
-	familyBudget_json['members'] = request.json['member_ids']
+	familyBudget_json['id'] = family_budget.id
+	familyBudget_json['money_amount'] = family_budget.money_amount
+	familyBudget_json['members'] = request.json['members_ids']
+	
 	
 	return jsonify(familyBudget_json), 200
 	
-@FamilyBudgets_blueprint.route('/<int:familyBudget_id>', methods=['GET'])
-def get_familyBudget(familyBudget_id):
-	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=familyBudget_id).first()
+@family_budgets_blieprint.route('/<int:family_budget_id>', methods=['GET'])
+@auth.login_required
+def get_familyBudget(family_budget_id):
+	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
 	if familyBudget is None:
 		return jsonify({'error': 'Budget not found'}), 404
-		
-	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=familyBudget_id).all()]
+
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=family_budget_id).all()]
 	
+	if auth.current_user().id not in members:
+		return jsonify({'error': 'You are not a member of this budget'}), 403
+
 	familyBudget_json = {}
 	
 	familyBudget_json['id'] = familyBudget.id
@@ -63,14 +70,18 @@ def get_familyBudget(familyBudget_id):
 	familyBudget_json['members'] = members
 	
 	return jsonify(familyBudget_json), 200
-	
-		
-@FamilyBudgets_blueprint.route('/<int:familyBudgets_id>', methods=['DELETE'])
-def delete_familyBudget(familyBudgets_id):
-	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=familyBudgets_id).first()
+
+@family_budgets_blieprint.route('/<int:family_budget_i>', methods=['DELETE'])
+@auth.login_required
+def delete_familyBudget(family_budget_id):
+	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
 	if familyBudget is None:
 		return jsonify({'error': 'Family budget not found'}), 404
-		
+	
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=family_budget_id).all()]
+	if auth.current_user().id not in members:
+		return jsonify({'error': 'You are not a member of this budget'}), 403
+
 	try:
 		db.session.delete(familyBudget)
 	except:
@@ -80,12 +91,17 @@ def delete_familyBudget(familyBudgets_id):
 	db.session.commit()
 	return jsonify({'message': 'family budget deleted successfully'}), 200
 	
-@FamilyBudgets_blueprint.route('/<int:familyBudgets_id>/report', methods=['GET'])
+@family_budgets_blieprint.route('/<int:familyBudgets_id>/report', methods=['GET'])
+@auth.login_required
 def get_familyBudget_report(familyBudgets_id):
 	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=familyBudgets_id).first()
 	if familyBudget is None:
 		return jsonify({'error': 'Budget not found'}), 404
 		
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=familyBudgets_id).all()]
+	if auth.current_user().id not in members:
+		return jsonify({'error': 'You are not a member of this budget'}), 403
+
 	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==familyBudgets_id and models.Operation.sender_type=="family").all()
 	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==familyBudgets_id and models.Operation.receiver_type=="family").all()
 	if report1 is None and report2 is None:
@@ -120,10 +136,10 @@ def get_familyBudget_report(familyBudgets_id):
 		
 	return jsonify(report_json), 200
 	
-@FamilyBudgets_blueprint.route('/<int:familyBudgets_id>/transfer', methods=['POST'])
-def post_familyBudget_transfer(familyBudgets_id):
-	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=familyBudgets_id).first()
-	if familyBudget is None:
+@family_budgets_blieprint.route('/<int:family_budget_id>/transfer', methods=['POST'])
+def post_familyBudget_transfer(family_budget_id):
+	family_budget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
+	if family_budget is None:
 		return jsonify({'error': 'Family budget not found'}), 404
 		
 	class Transfer(Schema):
@@ -141,11 +157,11 @@ def post_familyBudget_transfer(familyBudgets_id):
 	if request.json['money_amount'] < 0.1:
 		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 407
 	
-	if familyBudget.money_amount < request.json['money_amount']:
+	if family_budget.money_amount < request.json['money_amount']:
 		return jsonify({'error': 'Not enough money'}), 406
 	
 	now = datetime.now()
-	operation = models.Operation(sender_id=familyBudgets_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
+	operation = models.Operation(sender_id=family_budget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
 	
 	try:
 		db.session.add(operation)
@@ -166,7 +182,7 @@ def post_familyBudget_transfer(familyBudgets_id):
 			return jsonify({'error': 'Receiving budget doesn`t exist'}), 408
 		receiver_budget.money_amount = receiver_budget.money_amount + request.json['money_amount']
 		
-	familyBudget.money_amount = familyBudget.money_amount - request.json['money_amount']
+	family_budget.money_amount = family_budget.money_amount - request.json['money_amount']
 		
 	db.session.commit()
 	
@@ -181,7 +197,4 @@ def post_familyBudget_transfer(familyBudgets_id):
 	operation_json['date'] = operation.date
 	
 	return jsonify(operation_json), 200
-		
-		
-		
-
+	
