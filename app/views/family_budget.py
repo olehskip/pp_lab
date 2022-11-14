@@ -137,11 +137,16 @@ def get_familyBudget_report(familyBudgets_id):
 	return jsonify(report_json), 200
 	
 @family_budgets_blieprint.route('/<int:family_budget_id>/transfer', methods=['POST'])
+@auth.login_required
 def post_familyBudget_transfer(family_budget_id):
 	family_budget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
 	if family_budget is None:
 		return jsonify({'error': 'Family budget not found'}), 404
-		
+
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=familyBudgets_id).all()]
+	if auth.current_user().id not in members:
+		return jsonify({'error': 'You are not a member of this budget'}), 403
+	
 	class Transfer(Schema):
 		receiver_budget_id = fields.Int(required=True)
 		receiver_type = fields.Str(required=True)

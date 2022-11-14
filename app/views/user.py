@@ -62,7 +62,7 @@ def get_user(user_id):
 	user = db.session.query(models.Users).filter_by(id=user_id).first()
 	
 	if user != auth.current_user():
-		return jsonify({'error': 'Unauthorized access'}), 401
+		return jsonify({'error': 'Forbidden'}), 403
 
 	if user is None:
 		return jsonify({'error': 'User not found'}), 404
@@ -100,7 +100,7 @@ def update_user(user_id):
 		return jsonify({'error': 'Unauthorized access'}), 401
 	
 	if user is None:
-		return jsonify({'error': 'User does not exist'}), 404
+		return jsonify({'error': 'Forbidden'}), 403
 	
 	try:
 		if 'name' in request.json:
@@ -125,7 +125,8 @@ def delete_user(user_id):
 	user = db.session.query(models.Users).filter(models.Users.id == user_id).first()
 	
 	if user != auth.current_user():
-		return jsonify({'error': 'Unauthorized access'}), 401
+		return jsonify({'error': 'Forbidden'}), 403
+	
 
 	if user is None:
 		return jsonify({'error': 'User does not exist'}), 404
