@@ -22,7 +22,7 @@ def from_personal_model_to_json(personal_budget: models.PersonalBudgets):
 @auth.login_required
 def get_personal_budget(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
-		return jsonify({'error': 'Unauthorized access'}), 401
+		return jsonify({'error': 'Forbidden'}), 403
 	
 	personal_budget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 
@@ -35,7 +35,7 @@ def get_personal_budget(personal_budget_id):
 @auth.login_required
 def get_personal_budget_report(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
-		return jsonify({'error': 'Unauthorized access'}), 401
+		return jsonify({'error': 'Forbidden'}), 403
 
 	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==personal_budget_id and models.Operation.sender_type=="personal").all()
 	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==personal_budget_id and models.Operation.receiver_type=="personal").all()
@@ -75,7 +75,7 @@ def get_personal_budget_report(personal_budget_id):
 @auth.login_required
 def post_personal_budget_transfer(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
-		return jsonify({'error': 'Unauthorized access'}), 401
+		return jsonify({'error': 'Forbidden'}), 403
 
 	personalBudget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 	if personalBudget is None:
