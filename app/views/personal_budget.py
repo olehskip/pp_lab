@@ -6,6 +6,7 @@ import app.models as models
 import app.db as db
 from flask_bcrypt import Bcrypt
 from app.auth import auth
+from sqlalchemy import or_
 
 personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/personal_budget')
 bcrypt = Bcrypt()
@@ -26,9 +27,6 @@ def get_personal_budget(personal_budget_id):
 	
 	personal_budget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 
-	if personal_budget is None:
-		return jsonify({'error': 'Budget not found'}), 404
-
 	return from_personal_model_to_json(personal_budget), 200
 	
 @personal_budgets_blieprint.route('/<int:personal_budget_id>/report', methods=['GET'])
@@ -37,38 +35,23 @@ def get_personal_budget_report(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
 		return jsonify({'error': 'Forbidden'}), 403
 
-	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==personal_budget_id and models.Operation.sender_type=="personal").all()
-	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==personal_budget_id and models.Operation.receiver_type=="personal").all()
-	if report1 is None and report2 is None:
-		return jsonify({'error': 'This budget has no operations'}), 405
-		
 	report_json = []
-	for oper in report1:
-		operation = {}
+	reports = db.session.query(models.Operation).filter(models.Operation.sender_type=="personal").filter(or_(
+		models.Operation.sender_id==personal_budget_id, models.Operation.receiver_id==personal_budget_id)).all()
 		
-		operation['id'] = oper.id
-		operation['sender_id'] = oper.sender_id
-		operation['receiver_id'] = oper.receiver_id
-		operation['sender_type'] = oper.sender_type
-		operation['receiver_type'] = oper.receiver_type
-		operation['money_amount'] = oper.money_amount
-		operation['date'] = oper.date
+	for operation in reports:
+		operation_json = {}
 		
-		report_json.append(operation)
+		operation_json['id'] = operation.id
+		operation_json['sender_id'] = operation.sender_id
+		operation_json['receiver_id'] = operation.receiver_id
+		operation_json['sender_type'] = operation.sender_type
+		operation_json['receiver_type'] = operation.receiver_type
+		operation_json['money_amount'] = operation.money_amount
+		operation_json['date'] = operation.date
 		
-	for oper in report2:
-		operation = {}
-		
-		operation['id'] = oper.id
-		operation['sender_id'] = oper.sender_id
-		operation['receiver_id'] = oper.receiver_id
-		operation['sender_type'] = oper.sender_type
-		operation['receiver_type'] = oper.receiver_type
-		operation['money_amount'] = oper.money_amount
-		operation['date'] = oper.date
-		
-		report_json.append(operation)	
-		
+		report_json.append(operation_json)
+
 	return jsonify(report_json), 200
 	
 @personal_budgets_blieprint.route('/<int:personal_budget_id>/transfer', methods=['POST'])
@@ -78,9 +61,7 @@ def post_personal_budget_transfer(personal_budget_id):
 		return jsonify({'error': 'Forbidden'}), 403
 
 	personalBudget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
-	if personalBudget is None:
-		return jsonify({'error': 'User not found'}), 404
-		
+
 	class Transfer(Schema):
 		receiver_budget_id = fields.Int(required=True)
 		receiver_type = fields.Str(required=True)
@@ -96,16 +77,14 @@ def post_personal_budget_transfer(personal_budget_id):
 	if request.json['money_amount'] < 0.1:
 		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 400
 	
+	print(personalBudget.money_amount)
 	if personalBudget.money_amount < request.json['money_amount']:
 		return jsonify({'error': 'Not enough money'}), 400
 	
 	now = datetime.now()
 	operation = models.Operation(sender_id=personal_budget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
 	
-	try:
-		db.session.add(operation)
-	except:
-		return jsonify({'error': 'Failed to execute operation, database error'}), 405
+	db.session.add(operation)
 	
 	if request.json['receiver_type'] == "personal":
 		receiver_budget = db.session.query(models.PersonalBudgets).filter_by(id=request.json['receiver_budget_id']).first()

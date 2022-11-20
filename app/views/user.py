@@ -30,19 +30,12 @@ def create_user():
 	if user_already_exists:
 		return jsonify({'error': 'User already exists'}), 401
 
-	try:
-		db.session.add(new_user_model)
-	except:
-		db.session.rollback()
-		return jsonify({"Failed to add user, database error"}), 405
-		
-	new_personal_budget_model = models.PersonalBudgets(id=new_user_model.id, money_amount=0)
-	try:
-		db.session.add(new_personal_budget_model)
-	except:
-		db.session.rollback()
-		return jsonify({"Failed to create personal budget, database error"}), 405
-
+	db.session.add(new_user_model)
+	db.session.commit()
+	
+	new_personal_budget_model = models.PersonalBudgets(id=new_user_model.id, money_amount=10)
+	
+	db.session.add(new_personal_budget_model)
 	db.session.commit()
 
 	res_json = {}
@@ -54,18 +47,18 @@ def create_user():
 	res_json['personal_budget'] = new_user_model.id
 	res_json['family_budgets'] = [int(row.family_budget_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(user_id=new_user_model.id).all()]
 
-	return jsonify(res_json), 200
+	return jsonify(res_json), 201
 
 @user_blueprint.route('/<int:user_id>', methods=['GET'])
 @auth.login_required
 def get_user(user_id):
 	user = db.session.query(models.Users).filter_by(id=user_id).first()
 	
-	if user != auth.current_user():
-		return jsonify({'error': 'Forbidden'}), 403
-
 	if user is None:
 		return jsonify({'error': 'User not found'}), 404
+
+	if user != auth.current_user():
+		return jsonify({'error': 'Forbidden'}), 403
 	
 	res_json = {}
 	
@@ -95,25 +88,21 @@ def update_user(user_id):
 		return jsonify(err.messages), 400
 		
 	user = db.session.query(models.Users).filter(models.Users.id == user_id).first()
-		
-	if user != auth.current_user():
-		return jsonify({'error': 'Unauthorized access'}), 401
-	
+
 	if user is None:
-		return jsonify({'error': 'Forbidden'}), 403
+		return jsonify({'error': 'User not found'}), 404
+
+	if user != auth.current_user():
+		return jsonify({'error': 'Unauthorized access'}), 403
 	
-	try:
-		if 'name' in request.json:
-			user.name = request.json['name']
-		if 'username' in request.json:
-			user.username = request.json['username']
-		if 'password' in request.json:
-			user.password = bcrypt.generate_password_hash(request.json['password']).decode('utf-8')
-		if 'surname' in request.json:
-			user.suename = request.json['surname']
-	except:
-		db.session.rollback()
-		return jsonify({'error': "User data is not valid"}), 400
+	if 'name' in request.json:
+		user.name = request.json['name']
+	if 'username' in request.json:
+		user.username = request.json['username']
+	if 'password' in request.json:
+		user.password = bcrypt.generate_password_hash(request.json['password']).decode('utf-8')
+	if 'surname' in request.json:
+		user.suename = request.json['surname']
 
 	db.session.commit()
 
@@ -124,19 +113,13 @@ def update_user(user_id):
 def delete_user(user_id):
 	user = db.session.query(models.Users).filter(models.Users.id == user_id).first()
 	
+	if user is None:
+		return jsonify({'error': 'User does not exist'}), 404
+
 	if user != auth.current_user():
 		return jsonify({'error': 'Forbidden'}), 403
 	
-
-	if user is None:
-		return jsonify({'error': 'User does not exist'}), 404
-	
-	try:
-		db.session.delete(user)	
-	except:
-		db.session.rollback()
-		return jsonify({'error': "User data is not valid"}), 400
-	
+	db.session.delete(user)	
 	db.session.commit()
 
 	return jsonify({'message': "User deleted successfully"}), 200

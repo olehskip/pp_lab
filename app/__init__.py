@@ -1,5 +1,9 @@
 from flask import Flask
 app = Flask(__name__)
+app.config['DATABASE'] = "sqlite:///test.db"
+
+# 'postgresql+pg8000://postgres:123@localhost:5432/postgres'
+# 'sqlite:///test.db'
 
 from app.views import family_budget
 from app.views import personal_budget
