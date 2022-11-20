@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.models import *
 import pg8000
  
-engine = create_engine("postgresql://admin:admin@localhost/pp", echo=False)
+engine = create_engine("postgresql+pg8000://postgres:123@localhost:5432/postgres", echo=False)
 
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)
