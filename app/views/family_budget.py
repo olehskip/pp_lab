@@ -22,12 +22,9 @@ def create_new_familyBudget():
 	except ValidationError as err:
 		return jsonify(err.messages), 400
 		
-	family_budget = models.FamilyBudgets()
-	try:
-		db.session.add(family_budget)
-	except:
-		db.session.rollback()
-		return jsonify({"Datbase error, failed to add family budget"}), 405
+	family_budget = models.FamilyBudgets(money_amount=10)
+	
+	db.session.add(family_budget)
 	db.session.commit()
 	
 	if auth.current_user().id not in request.json['members_ids']:
@@ -35,11 +32,7 @@ def create_new_familyBudget():
 
 	for members_ids in request.json['members_ids']:
 		family_budget_user = models.FamilyBudgetsUsers(family_budget_id=family_budget.id, user_id=members_ids)
-		try:
-			db.session.add(family_budget_user)
-		except:
-			db.session.rollback()
-			return jsonify({"Datbase error, failed to add family member"}), 406
+		db.session.add(family_budget_user)
 	db.session.commit()
 	
 	familyBudget_json = {}
@@ -58,8 +51,8 @@ def get_familyBudget(family_budget_id):
 	if familyBudget is None:
 		return jsonify({'error': 'Budget not found'}), 404
 
-	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=family_budget_id).all()]
-	
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=models.FamilyBudgetsUsers.family_budget_id).all()]
+	print(members)
 	if auth.current_user().id not in members:
 		return jsonify({'error': 'You are not a member of this budget'}), 403
 
@@ -71,7 +64,7 @@ def get_familyBudget(family_budget_id):
 	
 	return jsonify(familyBudget_json), 200
 
-@family_budgets_blieprint.route('/<int:family_budget_i>', methods=['DELETE'])
+@family_budgets_blieprint.route('/<int:family_budget_id>', methods=['DELETE'])
 @auth.login_required
 def delete_familyBudget(family_budget_id):
 	familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
@@ -82,11 +75,7 @@ def delete_familyBudget(family_budget_id):
 	if auth.current_user().id not in members:
 		return jsonify({'error': 'You are not a member of this budget'}), 403
 
-	try:
-		db.session.delete(familyBudget)
-	except:
-		db.session.rollback()
-		return jsonify({'error': 'Database error'}), 405
+	db.session.delete(familyBudget)
 
 	db.session.commit()
 	return jsonify({'message': 'family budget deleted successfully'}), 200
@@ -104,8 +93,6 @@ def get_familyBudget_report(familyBudgets_id):
 
 	report1 = db.session.query(models.Operation).filter(models.Operation.sender_id==familyBudgets_id and models.Operation.sender_type=="family").all()
 	report2 = db.session.query(models.Operation).filter(models.Operation.receiver_id==familyBudgets_id and models.Operation.receiver_type=="family").all()
-	if report1 is None and report2 is None:
-		return jsonify({'error': 'This budget has no operations'}), 405
 		
 	report_json = []
 	for oper in report1:
@@ -143,7 +130,7 @@ def post_familyBudget_transfer(family_budget_id):
 	if family_budget is None:
 		return jsonify({'error': 'Family budget not found'}), 404
 
-	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=familyBudgets_id).all()]
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=models.FamilyBudgetsUsers.family_budget_id).all()]
 	if auth.current_user().id not in members:
 		return jsonify({'error': 'You are not a member of this budget'}), 403
 	
@@ -168,10 +155,7 @@ def post_familyBudget_transfer(family_budget_id):
 	now = datetime.now()
 	operation = models.Operation(sender_id=family_budget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
 	
-	try:
-		db.session.add(operation)
-	except:
-		return jsonify({'error': 'Failed to execute operation, database error'}), 405
+	db.session.add(operation)
 	
 	if request.json['receiver_type'] == "personal":
 		receiver_budget = db.session.query(models.PersonalBudgets).filter_by(id=request.json['receiver_budget_id']).first()

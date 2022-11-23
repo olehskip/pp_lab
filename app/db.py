@@ -1,12 +1,10 @@
-from re import U
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, Session
 from app.models import *
-import pg8000
+from app import app
  
-engine = create_engine("postgresql://admin:admin@localhost/pp", echo=False)
+engine = create_engine(app.config['DATABASE'], echo=False)
 
-metadata = MetaData(engine)
+metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
-

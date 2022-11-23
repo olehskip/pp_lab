@@ -1,0 +1,1 @@
+coverage run --source=app -m pytest tests ; if ($?) { coverage report -m }
