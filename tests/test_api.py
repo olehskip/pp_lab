@@ -19,16 +19,30 @@ def test_create_user(client):
 
 def test_create_family_budget(client):
     valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
+    db.session.add(models.Users(surname='Test10', name='Test10', username='Test10', password=bcrypt.generate_password_hash('Test').decode('utf-8')))
+    db.session.add(models.Users(surname='Test20', name='Test20', username='Test20', password=bcrypt.generate_password_hash('Test').decode('utf-8')))
+    db.session.commit()
     response = client.post(
         'family_budget/',
         headers={'Authorization': 'Basic ' + valid_credentials},
         content_type='application/json',
         data=json.dumps({
-            'members_ids': []
+            'members_ids': [1, 2, 3]
         })
     )
     assert response.status_code == 200
 
+def test_create_family_budget_2(client):
+    valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
+    response = client.post(
+        'family_budget/',
+        headers={'Authorization': 'Basic ' + valid_credentials},
+        content_type='application/json',
+        data=json.dumps({
+            'members_ids': [100, 200, 300]
+        })
+    )
+    assert response.status_code == 400
 
 class Test_PersonalBudget:
 
@@ -184,7 +198,7 @@ class Test_PersonalBudget:
         )
         assert response.status_code == 400
 
-    def test_408_post_personal_budget_transfer(self, client):
+    def test_400_6_post_personal_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'personal_budget/1/transfer',
@@ -196,10 +210,9 @@ class Test_PersonalBudget:
                 'money_amount': 2
             })
         )
-        print(response.data)
-        assert response.status_code == 408
+        assert response.status_code == 400
 
-    def test_408_2_post_personal_budget_transfer(self, client):
+    def test_400_7_post_personal_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'personal_budget/1/transfer',
@@ -212,7 +225,7 @@ class Test_PersonalBudget:
             })
         )
         print(response.data)
-        assert response.status_code == 408
+        assert response.status_code == 400
 
     # Get personal budget report
 
@@ -741,6 +754,19 @@ class Test_User:
         )
         assert response.status_code == 403
 
+    def test_create_family_budget_2(self, client):
+        valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
+        db.session.commit()
+        response = client.post(
+            'family_budget/',
+            headers={'Authorization': 'Basic ' + valid_credentials},
+            content_type='application/json',
+            data=json.dumps({
+                'members_ids': []
+            })
+        )
+        assert response.status_code == 400
+
     def test_delete_user(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.delete(
@@ -749,3 +775,4 @@ class Test_User:
             content_type='application/json',
         )
         assert response.status_code == 200
+

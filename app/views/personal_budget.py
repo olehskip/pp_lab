@@ -77,7 +77,6 @@ def post_personal_budget_transfer(personal_budget_id):
 	if request.json['money_amount'] < 0.1:
 		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 400
 	
-	print(personalBudget.money_amount)
 	if personalBudget.money_amount < request.json['money_amount']:
 		return jsonify({'error': 'Not enough money'}), 400
 	
@@ -90,14 +89,14 @@ def post_personal_budget_transfer(personal_budget_id):
 		receiver_budget = db.session.query(models.PersonalBudgets).filter_by(id=request.json['receiver_budget_id']).first()
 		if receiver_budget is None:
 			db.session.rollback()
-			return jsonify({'error': 'Receiving budget doesn`t exist'}), 408
+			return jsonify({'error': 'Receiving budget doesn`t exist'}), 400
 		receiver_budget.money_amount = receiver_budget.money_amount + request.json['money_amount']
 	
 	else:
 		receiver_budget = db.session.query(models.FamilyBudgets).filter_by(id=request.json['receiver_budget_id']).first()
 		if receiver_budget is None:
 			db.session.rollback()
-			return jsonify({'error': 'Receiving budget doesn`t exist'}), 408
+			return jsonify({'error': 'Receiving budget doesn`t exist'}), 400
 		receiver_budget.money_amount = receiver_budget.money_amount + request.json['money_amount']
 	
 	personalBudget.money_amount = personalBudget.money_amount - request.json['money_amount']

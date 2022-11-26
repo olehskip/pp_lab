@@ -3,10 +3,9 @@ from app import config
 
 app = Flask(__name__)
 
+app.config['DATABASE_STR'] = 'postgresql://admin:admin@localhost/pp'
 if config.is_testing:
     app.config['DATABASE_STR'] = 'sqlite:///test.db'
-else:
-    app.config['DATABASE_STR'] = 'postgresql://admin:admin@localhost/pp'
 
 from app.views import family_budget
 from app.views import personal_budget
