@@ -1,8 +1,8 @@
-"""empty message
+"""Init
 
-Revision ID: 2ab1b215165d
+Revision ID: 875300e2d931
 Revises: 
-Create Date: 2022-10-09 15:56:55.624359
+Create Date: 2022-11-26 17:25:25.562425
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2ab1b215165d'
+revision = '875300e2d931'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,16 @@ def upgrade():
     op.create_table('family_budgets',
     sa.Column('id', sa.Integer(), sa.Identity(always=True, start=1, increment=1, minvalue=1, maxvalue=2147483647, cycle=False, cache=1), nullable=False),
     sa.Column('money_amount', sa.BigInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('operations',
+    sa.Column('id', sa.Integer(), sa.Identity(always=True, start=1, increment=1, minvalue=1, maxvalue=2147483647, cycle=False, cache=1), nullable=False),
+    sa.Column('sender_id', sa.Integer(), nullable=False),
+    sa.Column('receiver_id', sa.Integer(), nullable=False),
+    sa.Column('sender_type', sa.String(length=40), nullable=False),
+    sa.Column('receiver_type', sa.String(length=40), nullable=False),
+    sa.Column('money_amount', sa.BigInteger(), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -36,14 +46,14 @@ def upgrade():
     sa.Column('id', sa.Integer(), sa.Identity(always=True, start=1, increment=1, minvalue=1, maxvalue=2147483647, cycle=False, cache=1), nullable=False),
     sa.Column('family_budget_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['family_budget_id'], ['family_budgets.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['family_budget_id'], ['family_budgets.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('personal_budgets',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('money_amount', sa.BigInteger(), nullable=False),
-    sa.ForeignKeyConstraint(['id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -54,5 +64,6 @@ def downgrade():
     op.drop_table('personal_budgets')
     op.drop_table('family_budgets_users')
     op.drop_table('users')
+    op.drop_table('operations')
     op.drop_table('family_budgets')
     # ### end Alembic commands ###
