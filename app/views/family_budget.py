@@ -59,7 +59,6 @@ def get_familyBudget(family_budget_id):
         return jsonify({'error': 'Budget not found'}), 404
 
     members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=models.FamilyBudgetsUsers.family_budget_id).all()]
-    print(members)
     if auth.current_user().id not in members:
         return jsonify({'error': 'You are not a member of this budget'}), 403
 
@@ -153,11 +152,11 @@ def post_familyBudget_transfer(family_budget_id):
     except ValidationError as err:
         return jsonify(err.messages), 400
         
-    if request.json['money_amount'] < 0.1:
-        return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 407
+    if request.json['money_amount'] < 1:
+        return jsonify({'error': 'Money amount couldn`t be less than 1'}), 400
     
     if family_budget.money_amount < request.json['money_amount']:
-        return jsonify({'error': 'Not enough money'}), 406
+        return jsonify({'error': 'Not enough money'}), 400
     
     now = datetime.now()
     operation = models.Operation(sender_id=family_budget_id, receiver_id=request.json['receiver_budget_id'], sender_type="personal", receiver_type=request.json['receiver_type'],money_amount=request.json['money_amount'],date=now)
@@ -168,14 +167,14 @@ def post_familyBudget_transfer(family_budget_id):
         receiver_budget = db.session.query(models.PersonalBudgets).filter_by(id=request.json['receiver_budget_id']).first()
         if receiver_budget is None:
             db.session.rollback()
-            return jsonify({'error': 'Receiving budget doesn`t exist'}), 408
+            return jsonify({'error': 'Receiving budget doesn`t exist'}), 400
         receiver_budget.money_amount = receiver_budget.money_amount + request.json['money_amount']
     
     else:
         receiver_budget = db.session.query(models.FamilyBudgets).filter_by(id=request.json['receiver_budget_id']).first()
         if receiver_budget is None:
             db.session.rollback()
-            return jsonify({'error': 'Receiving budget doesn`t exist'}), 408
+            return jsonify({'error': 'Receiving budget doesn`t exist'}), 400
         receiver_budget.money_amount = receiver_budget.money_amount + request.json['money_amount']
         
     family_budget.money_amount = family_budget.money_amount - request.json['money_amount']

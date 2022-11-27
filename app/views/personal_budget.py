@@ -74,8 +74,8 @@ def post_personal_budget_transfer(personal_budget_id):
 	except ValidationError as err:
 		return jsonify(err.messages), 400
 		
-	if request.json['money_amount'] < 0.1:
-		return jsonify({'error': 'Money amount couldn`t be less than 0.1'}), 400
+	if request.json['money_amount'] < 1:
+		return jsonify({'error': 'Money amount couldn`t be less than 1'}), 400
 	
 	if personalBudget.money_amount < request.json['money_amount']:
 		return jsonify({'error': 'Not enough money'}), 400

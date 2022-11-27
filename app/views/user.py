@@ -28,7 +28,7 @@ def create_user():
 	user_already_exists = db.session.query(models.Users).filter(models.Users.username == new_user_model.username).count() != 0
 	
 	if user_already_exists:
-		return jsonify({'error': 'User already exists'}), 401
+		return jsonify({'error': 'User already exists'}), 400
 
 	db.session.add(new_user_model)
 	db.session.commit()
@@ -45,7 +45,6 @@ def create_user():
 	res_json['name'] = new_user_model.name
 	res_json['username'] = new_user_model.username
 	res_json['personal_budget'] = new_user_model.id
-	res_json['family_budgets'] = [int(row.family_budget_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(user_id=new_user_model.id).all()]
 
 	return jsonify(res_json), 201
 
@@ -102,11 +101,11 @@ def update_user(user_id):
 	if 'password' in request.json:
 		user.password = bcrypt.generate_password_hash(request.json['password']).decode('utf-8')
 	if 'surname' in request.json:
-		user.suename = request.json['surname']
+		user.surname = request.json['surname']
 
 	db.session.commit()
 
-	return "", 200
+	return "", 204
 	
 @user_blueprint.route('/<int:user_id>', methods=['DELETE'])
 @auth.login_required
@@ -122,5 +121,5 @@ def delete_user(user_id):
 	db.session.delete(user)	
 	db.session.commit()
 
-	return jsonify({'message': "User deleted successfully"}), 200
+	return "", 204
 

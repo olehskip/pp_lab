@@ -467,8 +467,8 @@ components:
     FamilyBudget:
       type: object
       required:
-        - total_money_amount
-        - members
+        - money_amount
+        - member_ids
       properties:
         id:
           type: integer
@@ -478,9 +478,7 @@ components:
           type: integer
           example: 0
         members:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          type: number
 
     PersonalBudget:
       type: object
@@ -495,8 +493,8 @@ components:
         money_amount:
           type: integer
           example: 0
-        owner:
-          $ref: '#/components/schemas/User'
+        owner_id:
+          type: number
 
     BudgetReport:
       type: object
@@ -521,19 +519,12 @@ components:
 
     MoneyOperation:
       type: object
-      required:
-        - sender_budget_id
-        - receiver_budget_id
-        - sender_type
-        - receiver_type
-        - time
-        - money_amount
       properties:
         sender:
           $ref: '#/components/schemas/Budget'
         receiver:
           $ref: '#/components/schemas/Budget'
-        time:
+        date:
           type: string # date-time
           example: "1/09/2022 19:36:30"
         money_amount:
@@ -557,9 +548,7 @@ components:
         name:
           type: string
           example: "Master"
-        personal_budget:
-          $ref: "#/components/schemas/PersonalBudget"
-        family_budgets:
+        family_budgets_ids:
           type: array
           items:
             $ref: "#/components/schemas/FamilyBudget"

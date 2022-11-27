@@ -224,7 +224,6 @@ class Test_PersonalBudget:
                 'money_amount': 2
             })
         )
-        print(response.data)
         assert response.status_code == 400
 
     # Get personal budget report
@@ -460,7 +459,7 @@ class Test_FamilyBudget:
         )
         assert response.status_code == 400
 
-    def test_407_post_family_budget_transfer(self, client):
+    def test_400_3_post_family_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'family_budget/1/transfer',
@@ -472,9 +471,9 @@ class Test_FamilyBudget:
                 'money_amount': 0
             })
         )
-        assert response.status_code == 407
+        assert response.status_code == 400
 
-    def test_406_post_family_budget_transfer(self, client):
+    def test_400_4_post_family_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'family_budget/1/transfer',
@@ -486,9 +485,9 @@ class Test_FamilyBudget:
                 'money_amount': 11110
             })
         )
-        assert response.status_code == 406
+        assert response.status_code == 400
 
-    def test_408_post_family_budget_transfer(self, client):
+    def test_400_5_post_family_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'family_budget/1/transfer',
@@ -500,9 +499,9 @@ class Test_FamilyBudget:
                 'money_amount': 2
             })
         )
-        assert response.status_code == 408
+        assert response.status_code == 400
 
-    def test_408_2_post_family_budget_transfer(self, client):
+    def test_408_5_post_family_budget_transfer(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
         response = client.post(
             'family_budget/1/transfer',
@@ -514,7 +513,7 @@ class Test_FamilyBudget:
                 'money_amount': 2
             })
         )
-        assert response.status_code == 408
+        assert response.status_code == 400
 
 # Delete family budget
 
@@ -574,7 +573,7 @@ class Test_User:
         )
         assert response.status_code == 400 
 
-    def test_401_create_user(self, client):
+    def test_400_3_create_user(self, client):
         response = client.post(
             'user',
             content_type='application/json',
@@ -584,7 +583,7 @@ class Test_User:
                 'username': 'Test',
                 'password': 'Test'
             }))       
-        assert response.status_code == 401 
+        assert response.status_code == 400
 
     # Get user
     
@@ -638,7 +637,7 @@ class Test_User:
             data=json.dumps({
                 'surname': 'Test'
         }))
-        assert response.status_code == 200
+        assert response.status_code == 204
 
     def test_2_update_user(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
@@ -649,7 +648,7 @@ class Test_User:
             data=json.dumps({
                 'name': 'Test'
         }))
-        assert response.status_code == 200
+        assert response.status_code == 204
 
     def test_3_update_user(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
@@ -660,7 +659,7 @@ class Test_User:
             data=json.dumps({
                 'username': 'Test'
         }))
-        assert response.status_code == 200
+        assert response.status_code == 204
 
     def test_4_update_user(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
@@ -671,7 +670,7 @@ class Test_User:
             data=json.dumps({
                 'password': 'Test'
         }))
-        assert response.status_code == 200
+        assert response.status_code == 204
 
     def test_400_update_user(self, client):
         valid_credentials = base64.b64encode(b"Test:Test").decode("utf-8")
@@ -774,5 +773,5 @@ class Test_User:
             headers={'Authorization': 'Basic ' + valid_credentials},
             content_type='application/json',
         )
-        assert response.status_code == 200
+        assert response.status_code == 204
 
