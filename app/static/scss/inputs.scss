@@ -1,0 +1,28 @@
+@use "colors.scss";
+
+%simple-input {
+	border: 1px solid colors.$gray-color;
+	padding: 10px;
+	font-size: 16px;
+	border-radius: 5px;
+	box-shadow: none;
+	outline: none;
+	transition: all 0.3s ease-in-out;
+	margin-bottom: 10px;
+	
+	&:hover, &:focus {
+		border-color: colors.$gray-color;
+	}
+	
+	&:focus {
+		box-shadow: 0 0 5px colors.$gray-color;
+	}
+	
+	&::placeholder {
+		color: colors.$gray-color;
+	}
+	
+	&.error {
+		border-color: colors.$red-color;
+	} 
+}

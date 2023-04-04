@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>User Profile</title>
+	<link rel="stylesheet" href="styles/profile.css">
+	<script src="scripts/profile.js" defer></script>
+</head>
+<body>
+	<header class="header">
+		<nav>
+			<ul>
+				<li><a href="profile.html">Profile</a></li>
+				<li><a href="budgets.html">Budgets</a></li>
+				<li><a href="transfer_money.html">Transfer</a></li>
+				<li><a href="profiles.html">All users</a></li>
+				<li><a href="all_budgets.html">All budgets</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<div class="profile-container">
+		<div class="profile-container-caption">User Profile</div>
+		<form>
+			<div class="form-group">
+				<label for="username">Username:</label>
+				<input type="text" id="username" name="username" value="john_doe">
+			</div>
+			<div class="form-group">
+				<label for="surname">Surname:</label>
+				<input type="text" id="surname" name="surname" value="Doe">
+			</div>
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" value="John">
+			</div>
+			<div class="form-group">
+				<label for="new-password">New Password:</label>
+				<input type="password" id="new-password" name="new-password">
+			</div>
+			<div class="form-group">
+				<label for="confirm-password">Confirm Password:</label>
+				<input type="password" id="confirm-password" name="confirm-password">
+			</div>
+			<div class="buttons-container">
+				<button type="submit" class="submit-button">Save</button>
+				<button type="button" class="logout-button">Log Out</button>
+				<button type="button" class="discard-button">Discard Changes</button>
+			</div>
+		</form>
+		
+	</div>
+</body>
+</html>

@@ -5,11 +5,22 @@ import app.db as db
 from flask_bcrypt import Bcrypt
 from app.auth import auth
 
-user_blueprint = Blueprint('user', __name__, url_prefix='/user')
+user_blueprint = Blueprint('user', __name__, url_prefix='/api/user')
 bcrypt = Bcrypt()
 	
+@user_blueprint.route('', methods=['GET'])
+def get_all_users():
+	users = db.session.query(models.Users).all()
+	res_json = []
+	for user in users:
+		user_json = {}
+		user_json['username'] = user.username
+		res_json.append(user_json)
+	return jsonify(res_json), 200
+
 @user_blueprint.route('', methods=['POST'])
 def create_user():
+	print("received request", request.json)
 	class User(Schema):
 		surname = fields.Str(required=True)
 		name = fields.Str(required=True)
@@ -49,15 +60,15 @@ def create_user():
 	return jsonify(res_json), 201
 
 @user_blueprint.route('/<int:user_id>', methods=['GET'])
-@auth.login_required
+# @auth.login_required
 def get_user(user_id):
 	user = db.session.query(models.Users).filter_by(id=user_id).first()
 	
 	if user is None:
 		return jsonify({'error': 'User not found'}), 404
 
-	if user != auth.current_user():
-		return jsonify({'error': 'Forbidden'}), 403
+	# if user != auth.current_user():
+	# 	return jsonify({'error': 'Forbidden'}), 403
 	
 	res_json = {}
 	
@@ -69,7 +80,38 @@ def get_user(user_id):
 	res_json['family_budgets'] = [int(row.family_budget_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(user_id=user_id).all()]
 
 	return jsonify(res_json), 200
+
+@user_blueprint.route('/<int:user_id>/budgets', methods=['GET'])
+def get_user_budgets(user_id):
+	user = db.session.query(models.Users).filter_by(id=user_id).first()
 	
+	if user is None:
+		return jsonify({'error': 'User not found'}), 404
+
+	# if user != auth.current_user():
+	# 	return jsonify({'error': 'Forbidden'}), 403
+	
+	budgets_json = []
+	personal_budgets = db.session.query(models.PersonalBudgets).filter_by(id=user_id).all()
+	for personal_budget in personal_budgets:
+		budget_json = {}
+		budget_json['id'] = personal_budget.id
+		budget_json['money_amount'] = personal_budget.money_amount
+		budget_json['members'] = db.session.query(models.Users).filter_by(id=personal_budget.id).first().username
+		budget_json['type'] = 'personal'
+		budgets_json.append(budget_json)
+		
+	family_budgets = db.session.query(models.FamilyBudgets, models.FamilyBudgetsUsers).outerjoin(models.FamilyBudgetsUsers, models.FamilyBudgetsUsers.family_budget_id==models.FamilyBudgets.id,).filter(models.FamilyBudgetsUsers.user_id==user_id).all()
+	for family_budget, _ in family_budgets:
+		budget_json = {}
+		budget_json['id'] = family_budget.id
+		budget_json['money_amount'] = family_budget.money_amount
+		budget_json['members'] = [user.username for user, _ in db.session.query(models.Users, models.FamilyBudgetsUsers).outerjoin(models.FamilyBudgetsUsers, models.FamilyBudgetsUsers.user_id==models.Users.id,).filter(models.FamilyBudgetsUsers.family_budget_id==family_budget.id).all()]
+
+		budget_json['type'] = 'family'
+		budgets_json.append(budget_json)
+	return jsonify(budgets_json), 200
+
 @user_blueprint.route('/<int:user_id>', methods=['PATCH'])
 @auth.login_required
 def update_user(user_id):	

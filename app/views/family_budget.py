@@ -6,7 +6,7 @@ import app.db as db
 from flask_bcrypt import Bcrypt
 from app.auth import auth
 
-family_budgets_blieprint = Blueprint('FamilyBudgets', __name__, url_prefix='/family_budget')
+family_budgets_blieprint = Blueprint('FamilyBudgets', __name__, url_prefix='/api/family_budget')
 bcrypt = Bcrypt()
 
 @family_budgets_blieprint.route('/', methods=['POST'])

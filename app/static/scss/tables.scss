@@ -1,0 +1,91 @@
+@use "colors.scss";
+@use "buttons.scss";
+
+%table-with-actions {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+	
+	th {
+		background-color: colors.$blue-color;
+		color: colors.$white-color;
+		padding: 10px;
+		text-align: center;
+	}
+	
+	td {
+		padding: 10px;
+		border-bottom: 1px solid colors.$white-color;
+		text-align: center;
+		
+		&:last-child {
+			button {
+				@extend %simple-button;
+				padding: 5px 10px;
+			}
+		}
+	}
+}
+
+%table-seperated {
+	border-collapse: separate;
+	border-spacing: 0 20px;
+	width: 100%;
+	table-layout: fixed;
+
+	caption {
+		font-size: 33px;
+	}
+
+	th, td {
+		text-align: left;
+		font-size: 19px;
+		vertical-align:middle;
+		padding: 10px;
+	}
+	thead {
+		color: grey;
+		font-weight: 700;
+	}
+
+	tbody tr {
+		background-color: white;
+		box-shadow: 0 0 4px blue;
+		transition: all .2s ease-in-out;
+	}
+
+	tbody tr:hover {
+		transform: scale(1.003); 
+	}
+
+	// source: https://codepen.io/AllThingsSmitty/pen/MyqmdM
+	@media screen and (max-width: 1000px) {
+		thead {
+			border: none;
+			clip: rect(0 0 0 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+		}
+		
+		td {
+			display: block;
+			width: 95% !important;
+		}
+		
+		td::before {
+			content: attr(data-label);
+			float: left;
+			font-weight: bold;
+			text-transform: uppercase;
+			width: 100%;
+		}
+		
+		td:last-child {
+			border-bottom: 0;
+		}
+	}
+}

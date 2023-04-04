@@ -1,0 +1,27 @@
+@use "header.scss";
+@use "colors.scss";
+
+body {
+	background-color: colors.$background-color;
+	margin: 0;
+}
+
+.header {
+	@extend %header;
+}
+
+.error-container {
+	height: 100% !important;
+}
+
+.error-caption {
+	font-size: 35px;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.error-image {
+	display: block;
+	max-height: 300px;
+	margin: 0 auto;
+}

@@ -8,7 +8,7 @@ from flask_bcrypt import Bcrypt
 from app.auth import auth
 from sqlalchemy import or_
 
-personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/personal_budget')
+personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/api/personal_budget')
 bcrypt = Bcrypt()
 
 def from_personal_model_to_json(personal_budget: models.PersonalBudgets):
@@ -20,10 +20,10 @@ def from_personal_model_to_json(personal_budget: models.PersonalBudgets):
 	return jsonify(personal_budgets_json)
 
 @personal_budgets_blieprint.route('/<int:personal_budget_id>', methods=['GET'])
-@auth.login_required
+# @auth.login_required
 def get_personal_budget(personal_budget_id):
-	if personal_budget_id != auth.current_user().id:
-		return jsonify({'error': 'Forbidden'}), 403
+	# if personal_budget_id != auth.current_user().id:
+		# return jsonify({'error': 'Forbidden'}), 403
 	
 	personal_budget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 

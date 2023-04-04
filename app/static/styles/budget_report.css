@@ -1,0 +1,223 @@
+.header nav ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 5px;
+  font-size: 24px;
+  background-color: white;
+  gap: 10px;
+}
+.header nav ul li {
+  list-style: none;
+  margin: 0 1rem;
+}
+.header nav ul li a {
+  color: #333;
+  text-decoration: none;
+  position: relative;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.header nav ul li a:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: #333;
+  visibility: hidden;
+  transform: scaleX(0);
+  transition: all 0.25s ease-in-out 0s;
+}
+.header nav ul li a:hover:after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+.report-info-container .info-header button, .new-member-button {
+  padding: 10px 15px;
+  margin: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.5s;
+}
+
+.report-info-container .info-header button:hover, .new-member-button:hover {
+  filter: brightness(90%);
+}
+
+.item input, .new-member-input {
+  border: 1px solid #999;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  box-shadow: none;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 10px;
+}
+.item input:hover, .new-member-input:hover, .item input:focus, .new-member-input:focus {
+  border-color: #999;
+}
+.item input:focus, .new-member-input:focus {
+  box-shadow: 0 0 5px #999;
+}
+.item input::placeholder, .new-member-input::placeholder {
+  color: #999;
+}
+.item input.error, .error.new-member-input {
+  border-color: #e74c3c;
+}
+
+.report-info-container {
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+}
+
+.report-info-container .info-header .report-info {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #3498db;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.report-table {
+  border-collapse: separate;
+  border-spacing: 0 20px;
+  width: 100%;
+  table-layout: fixed;
+}
+.report-table caption {
+  font-size: 33px;
+}
+.report-table th, .report-table td {
+  text-align: left;
+  font-size: 19px;
+  vertical-align: middle;
+  padding: 10px;
+}
+.report-table thead {
+  color: grey;
+  font-weight: 700;
+}
+.report-table tbody tr {
+  background-color: white;
+  box-shadow: 0 0 4px blue;
+  transition: all 0.2s ease-in-out;
+}
+.report-table tbody tr:hover {
+  transform: scale(1.003);
+}
+@media screen and (max-width: 1000px) {
+  .report-table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  .report-table td {
+    display: block;
+    width: 95% !important;
+  }
+  .report-table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+  }
+  .report-table td:last-child {
+    border-bottom: 0;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: #F0F4F7;
+}
+
+.report-info-container {
+  max-width: 800px;
+}
+.report-info-container .info-header {
+  margin-bottom: 20px;
+}
+.report-info-container .info-header .report-info {
+  margin: 0;
+  align-self: center;
+}
+.show-report-button {
+  background-color: #3498db;
+}
+
+.transfer-money-button {
+  background-color: #4CAF50;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.item label {
+  flex: 1;
+  font-weight: bold;
+  margin-right: 10px;
+}
+.item input {
+  flex: 2;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+}
+
+.new-member-container {
+  width: 100%;
+  margin: 10px;
+}
+
+.new-member-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.new-member-caption {
+  font-weight: bold;
+  font-size: 19px;
+}
+
+.new-member-button {
+  padding: 5px 10px;
+  margin-right: 10px;
+  background-color: #4CAF50;
+}
+
+.new-member-input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/*# sourceMappingURL=budget_report.css.map */

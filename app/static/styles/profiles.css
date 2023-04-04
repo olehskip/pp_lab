@@ -1,0 +1,118 @@
+.header nav ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 5px;
+  font-size: 24px;
+  background-color: white;
+  gap: 10px;
+}
+.header nav ul li {
+  list-style: none;
+  margin: 0 1rem;
+}
+.header nav ul li a {
+  color: #333;
+  text-decoration: none;
+  position: relative;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.header nav ul li a:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: #333;
+  visibility: hidden;
+  transform: scaleX(0);
+  transition: all 0.25s ease-in-out 0s;
+}
+.header nav ul li a:hover:after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+.users-list td:last-child button {
+  padding: 10px 15px;
+  margin: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.5s;
+}
+
+.users-list td:last-child button:hover {
+  filter: brightness(90%);
+}
+
+.users-container {
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+}
+
+.users-caption {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #3498db;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.users-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.users-list th {
+  background-color: #3498db;
+  color: #ffffff;
+  padding: 10px;
+  text-align: center;
+}
+.users-list td {
+  padding: 10px;
+  border-bottom: 1px solid #ffffff;
+  text-align: center;
+}
+.users-list td:last-child button {
+  padding: 5px 10px;
+}
+
+body {
+  margin: 0;
+  background-color: #F0F4F7;
+}
+
+.users-container {
+  max-width: 800px;
+}
+
+.users-caption {
+  margin: 0;
+}
+
+.budgets-button {
+  background-color: #4CAF50;
+}
+
+.edit-button {
+  background-color: #3498db;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+}
+
+/*# sourceMappingURL=profiles.css.map */
