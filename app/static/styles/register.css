@@ -15,6 +15,11 @@
   filter: brightness(90%);
 }
 
+.register-container button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .register-container .form-header {
   text-align: center;
   margin-bottom: 20px;

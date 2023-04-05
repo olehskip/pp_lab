@@ -53,6 +53,11 @@
   filter: brightness(90%);
 }
 
+.submit-button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .container {
   margin: 0 auto;
   padding: 50px;

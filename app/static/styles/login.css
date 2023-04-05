@@ -15,6 +15,11 @@
   filter: brightness(90%);
 }
 
+.login-container button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .login-container .form-header {
   text-align: center;
   margin-bottom: 20px;

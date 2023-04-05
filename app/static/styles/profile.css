@@ -59,6 +59,11 @@
   filter: brightness(90%);
 }
 
+.profile-container .buttons-container button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .profile-container input {
   border: 1px solid #999;
   padding: 10px;

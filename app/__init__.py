@@ -10,8 +10,9 @@ if config.is_testing:
 from app.views import family_budget
 from app.views import personal_budget
 from app.views import user
+from app.views import budgets
 
 app.register_blueprint(user.user_blueprint)
 app.register_blueprint(family_budget.family_budgets_blieprint)
 app.register_blueprint(personal_budget.personal_budgets_blieprint)
-
+app.register_blueprint(budgets.budgets_blueprint)

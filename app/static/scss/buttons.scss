@@ -22,3 +22,8 @@
 %simple-button:hover {
 	filter: brightness(90%);
 }
+
+%simple-button:disabled {
+	cursor: not-allowed;
+	filter: brightness(80%);
+}

@@ -53,6 +53,11 @@
   filter: brightness(90%);
 }
 
+.users-list td:last-child button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .users-container {
   margin: 0 auto;
   padding: 50px;

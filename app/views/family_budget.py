@@ -52,21 +52,24 @@ def create_new_familyBudget():
     return jsonify(familyBudget_json), 200
     
 @family_budgets_blieprint.route('/<int:family_budget_id>', methods=['GET'])
-@auth.login_required
+# @auth.login_required
 def get_familyBudget(family_budget_id):
     familyBudget = db.session.query(models.FamilyBudgets).filter_by(id=family_budget_id).first()
     if familyBudget is None:
         return jsonify({'error': 'Budget not found'}), 404
 
     members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=models.FamilyBudgetsUsers.family_budget_id).all()]
-    if auth.current_user().id not in members:
-        return jsonify({'error': 'You are not a member of this budget'}), 403
+    # if auth.current_user().id not in members:
+    #     return jsonify({'error': 'You are not a member of this budget'}), 403
 
     familyBudget_json = {}
+    familyBudget_json['members'] = []
+    for member in members:
+        familyBudget_json['members'].append(db.session.query(models.Users).filter_by(id=member).first().username)
     
     familyBudget_json['id'] = familyBudget.id
     familyBudget_json['money_amount'] = familyBudget.money_amount
-    familyBudget_json['members'] = members
+    # familyBudget_json['members'] = members
     
     return jsonify(familyBudget_json), 200
 

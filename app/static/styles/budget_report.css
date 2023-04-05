@@ -53,6 +53,11 @@
   filter: brightness(90%);
 }
 
+.report-info-container .info-header button:disabled, .new-member-button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
 .item input, .new-member-input {
   border: 1px solid #999;
   padding: 10px;

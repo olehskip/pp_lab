@@ -21,8 +21,8 @@
 			<div class="info-header">
 				<div class="budget-info">Budget Information</div>
 				<div class="buttons-container">
-					<button class="show-report-button">Show Report</button>
-					<button class="transfer-money-button">Transfer money</button>
+					<!-- <button class="show-report-button" id="show-report-button">Show Report</button> -->
+					<button class="transfer-money-button" id="transfer-money-button">Transfer money</button>
 					<button class="delete-button">Delete budget</button>
 				</div>
 			</div>
@@ -36,7 +36,7 @@
 			</div>
 			<div class="item">
 				<label for="money">Money:</label>
-				<input type="text" id="money" readonly />
+				<input type="text" id="money_amount" readonly />
 			</div>
 			<hr/>
 			<div class="new-member-container">
@@ -70,5 +70,6 @@
 				</tbody>
 			</table>
 		</div>
+		<script src="scripts/budget_info.js"></script>
 	</body>
 </html>
