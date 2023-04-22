@@ -1,0 +1,55 @@
+@use "colors.scss";
+@use "buttons.scss";
+@use "form_containers.scss";
+@use "inputs.scss";
+
+body {
+	background-color: colors.$background-color;
+	margin: 0;
+	padding: 0;
+}
+
+.profile-container {
+	@extend %simple-form-container;
+	max-width: 600px;
+
+	.profile-container-caption {
+		@extend %simple-caption;
+	}
+	
+	.form-group {
+		margin-bottom: 15px;
+	}
+	
+	label {
+		display: block;
+		margin-bottom: 5px;
+		font-weight: bold;
+	}
+
+	input {
+		@extend %simple-input;
+		width: 100%;
+	}
+	
+	.buttons-container {
+		@extend %simple-buttons-container;
+
+		button {
+			@extend %simple-button;
+		}
+
+		.submit-button {
+			background-color: colors.$green-button-color;
+		}
+
+		.logout-button {
+			background-color: colors.$azure-button-color;
+		}
+
+		.discard-button {
+			background-color: colors.$red-button-color;
+		}
+	}
+}
+

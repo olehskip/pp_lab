@@ -1,0 +1,63 @@
+@use "buttons.scss";
+@use "colors.scss";
+@use "form_containers.scss";
+@use "tables.scss";
+
+body {
+	background-color: colors.$background-color;
+	margin: 0;
+}
+
+.budgets-container {
+	@extend %simple-form-container;
+	margin: 100px;
+	margin-top: 20px;
+	@media screen and (max-width: 1000px) {
+		margin: 10px;
+	}
+}
+
+.budgets-container-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-left: auto;
+	gap: 30px;
+}
+
+.caption {
+	font-size: 35px;
+	font-weight: 700;
+	color: colors.$form-caption-color;
+}
+
+.buttons-container {
+	margin-right: 10px;
+
+	button {
+		@extend %simple-button;
+	}
+}
+
+.create-budget-button {
+	background-color: colors.$green-button-color;
+}
+
+.view-budget-button {
+	background-color: colors.$azure-button-color;
+}
+
+.delete-budget-button {
+	background-color: colors.$red-button-color;
+}
+
+.budgets-table {
+	@extend %table-seperated;
+
+	th:first-child,td:first-child {
+		width: 2%;
+	}
+	th:last-child,td:last-child {
+		width: 45%;
+	}
+}

@@ -1,0 +1,37 @@
+<template>
+    <div class="profile-container">
+		<div class="profile-container-caption">User Profile</div>
+		<form>
+			<div class="form-group">
+				<label for="username">Username:</label>
+				<input type="text" id="username" name="username" value="john_doe">
+			</div>
+			<div class="form-group">
+				<label for="surname">Surname:</label>
+				<input type="text" id="surname" name="surname" value="Doe">
+			</div>
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" value="John">
+			</div>
+			<div class="form-group">
+				<label for="new-password">New Password:</label>
+				<input type="password" id="new-password" name="new-password">
+			</div>
+			<div class="form-group">
+				<label for="confirm-password">Confirm Password:</label>
+				<input type="password" id="confirm-password" name="confirm-password">
+			</div>
+			<div class="buttons-container">
+				<button type="submit" class="submit-button">Save</button>
+				<button type="button" class="logout-button">Log Out</button>
+				<button type="button" class="discard-button">Discard Changes</button>
+			</div>
+		</form>
+		
+	</div>
+</template>
+
+<style lang="scss">
+    @use '@/styles/profile.scss'
+</style>

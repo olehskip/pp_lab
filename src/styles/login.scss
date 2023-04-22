@@ -1,0 +1,17 @@
+@use "form_containers.scss";
+
+body {
+	margin: 0;
+}
+
+.login-container {
+	@extend %form-with-image-container;
+}
+
+.right-part {
+	background-image: url("@/assets/login_background.jpg");
+}
+
+.stmh {
+	background-color: red;;
+}
