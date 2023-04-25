@@ -48,6 +48,10 @@ body {
 		}
 
 		.discard-button {
+			background-color: colors.$blue-button-color;
+		}
+
+		.delete-button {
 			background-color: colors.$red-button-color;
 		}
 	}
