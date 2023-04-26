@@ -142,6 +142,9 @@ export default {
 					this.$cookies.remove('token');
 					this.$router.push('/login');
 				}
+				else if(response.status == 409) {
+					this.toast.error("Username already exists");
+				}
 				else {
 					this.toast.error("Error updating profile");
 				}
