@@ -105,6 +105,11 @@ def update_current_user():
 		return jsonify(err.messages), 400
 	
 	
+	if 'username' in request.json and not request.json['username'] == user.username:
+		user_already_exists = db.session.query(models.Users).filter(models.Users.username == request.json['username']).count() != 0
+		if user_already_exists:
+			return jsonify({'error': 'User already exists'}), 409
+
 
 	if 'surname' in request.json and len(request.json['surname']) > 0:
 		user.surname = request.json['surname']
@@ -114,13 +119,6 @@ def update_current_user():
 		user.username = request.json['username']
 	if 'password' in request.json and len(request.json['password']) > 0:
 		user.password = bcrypt.generate_password_hash(request.json['password']).decode('utf-8')
-	
-	# if already exists
-	user_already_exists = db.session.query(models.Users).filter(models.Users.username == user.username).count() != 0
-
-	if user_already_exists:
-		return jsonify({'error': 'User already exists'}), 409
-	S
 
 	db.session.commit()
 
