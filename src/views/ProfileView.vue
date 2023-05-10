@@ -59,6 +59,7 @@ export default {
 			if(this.$cookies.get('token') == null) {
 				this.toast.info("You are not logged in");
 				this.$router.push('/login');
+				return;
 			}
 		
 			var token = this.$cookies.get('token');
@@ -95,25 +96,27 @@ export default {
 			if(this.$cookies.get('token') == null) {
 				this.toast.info("You are not logged in");
 				this.$router.push('/login');
-			}
-			if(this.username.length < 6) {
-				this.toast.error("Username must have at least 6 characters");
 				return;
 			}
-			if(this.surname.length < 6) {
-				this.toast.error("Surname must have at least 6 characters");
-				return;
+
+			var is_data_valid = true;
+			if(this.username.length == 0) {
+				this.toast.error("Username cannot be empty");
+				is_data_valid = false;
 			}
-			if(this.name.length < 6) {
-				this.toast.error("Name must have at least 6 characters");
-				return;
+			if(this.surname.length == 0) {
+				this.toast.error("Surname cannot be empty");
+				is_data_valid = false;
 			}
-			if(this.password.length > 0 && this.password.length < 6) {
-				this.toast.error("Password must have at least 6 characters");
-				return;
+			if(this.name.length == 0) {
+				this.toast.error("Name cannot be empty");
+				is_data_valid = false;
 			}
-			else if(this.password.length > 0 && this.password !== this.password_repeat) {
+			if(this.password != this.password_repeat) {
 				this.toast.error("Passwords do not match");
+				is_data_valid = false;
+			}
+			if(!is_data_valid) {
 				return;
 			}
 
@@ -144,6 +147,17 @@ export default {
 				}
 				else if(response.status == 409) {
 					this.toast.error("Username already exists");
+				}
+				else if(response.status == 400) {
+					response.json().then(response => {
+                        for (var key in response) {
+							var val = response[key];
+							this.toast.error(key + ": " + val);
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        this.toast.error("Error");
+                    });
 				}
 				else {
 					this.toast.error("Error updating profile");

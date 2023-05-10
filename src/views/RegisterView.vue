@@ -53,24 +53,27 @@ export default {
 	methods: {
 		send_register() {
             var is_data_valid = true;
-
-			if(this.username.length < 6) {
-                this.toast.error("Username must have at least 6 characters");
+            if(this.username.length == 0) {
+                this.toast.error("Username cannot be empty");
                 is_data_valid = false;
             }
-            if(this.surname.length < 6) {
-                this.toast.error("Surname must have at least 6 characters");
+            if(this.surname.length == 0) {
+                this.toast.error("Surname cannot be empty");
                 is_data_valid = false;
             }
-            if(this.name.length < 6) {
+            if(this.name.length == 0) {
+                this.toast.error("Name cannot be empty");
                 is_data_valid = false;
-                this.toast.error("Name must have at least 6 characters");
             }
-            if(this.password.length < 6) {
+            if(this.password.length == 0) {
+                this.toast.error("Password cannot be empty");
                 is_data_valid = false;
-                this.toast.error("Password must have at least 6 characters");
             }
-            else if(this.password_repeat != this.password) {
+            else if(this.password_repeat.length == 0) {
+                this.toast.error("Password cannot be empty");
+                is_data_valid = false;
+            }
+            else if(this.password != this.password_repeat) {
                 this.toast.error("Passwords do not match");
                 is_data_valid = false;
             }
@@ -96,7 +99,15 @@ export default {
                     this.toast.error("Username already exists");
                 }
                 else if(response.status == 400) {
-                    this.toast.error("Invalid data");
+                    response.json().then(response => {
+                        for (var key in response) {
+                            var val = response[key];
+                            this.toast.error(key + ": " + val);
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        this.toast.error("Error");
+                    });
                 }
                 else if(response.status == 200){
                     response.json().then(response => {

@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields, ValidationError, validate
 from flask import Blueprint, jsonify, request
 import app.models as models
 import app.db as db
@@ -25,8 +25,8 @@ def get_all_users():
 def create_user():
 	print("received request", request.json)
 	class User(Schema):
-		surname = fields.Str(required=True)
-		name = fields.Str(required=True)
+		surname = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
+		name = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
 		username = fields.Str(required=True)
 		password = fields.Str(required=True)
 		
@@ -92,10 +92,10 @@ def update_current_user():
 		return jsonify({'error': 'User not found'}), 404
 	
 	class User(Schema):
-		surname = fields.Str(required=False)
-		name = fields.Str(required=False)
-		username = fields.Str(required=False)
-		password = fields.Str(required=False)
+		surname = fields.Str(required=False, validate=[validate.Length(max=50)])
+		name = fields.Str(required=False, validate=[validate.Length(max=50)])
+		username = fields.Str(required=False, validate=[validate.Length(max=50)])
+		password = fields.Str(required=False, validate=[validate.Length(max=50)])
 
 	try:
 		if not request.json:
@@ -196,10 +196,10 @@ def get_user_budgets(user_id):
 def update_user(user_id):	
 	try:
 		class User(Schema):
-			surname = fields.Str(required=False)
-			name = fields.Str(required=False)
-			username = fields.Str(required=False)
-			password = fields.Str(required=False)
+			surname = fields.Str(required=False, validate=[validate.Length(max=50)])
+			name = fields.Str(required=False, validate=[validate.Length(max=50)])
+			username = fields.Str(required=False, validate=[validate.Length(max=50)])
+			password = fields.Str(required=False, validate=[validate.Length(max=50)])
 			
 		if not request.json:
 			raise ValidationError('No input data provided')
@@ -223,7 +223,7 @@ def update_user(user_id):
 		user.password = bcrypt.generate_password_hash(request.json['password']).decode('utf-8')
 	if 'surname' in request.json and len(request.json['surname']) > 0:
 		user.surname = request.json['surname']
-	print("updated")
+
 	db.session.commit()
 
 	return "", 204
@@ -248,8 +248,8 @@ def delete_user(user_id):
 def login():
 	try:
 		class User(Schema):
-			username = fields.Str(required=True)
-			password = fields.Str(required=True)
+			username = fields.Str(required=True, validate=[validate.Length(min=1, max=50)])
+			password = fields.Str(required=True, validate=[validate.Length(min=1, max=50)])
 			
 		if not request.json:
 			raise ValidationError('No input data provided')
@@ -271,10 +271,10 @@ def login():
 def register():
 	try:
 		class User(Schema):
-			surname = fields.Str(required=True)
-			name = fields.Str(required=True)
-			username = fields.Str(required=True)
-			password = fields.Str(required=True)
+			surname = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
+			name = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
+			username = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
+			password = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
 			
 		if not request.json:
 			raise ValidationError('No input data provided')
