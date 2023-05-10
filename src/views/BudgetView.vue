@@ -54,6 +54,68 @@
     </div>
 </template>
 
+<script>
+import { useToast } from "vue-toastification";
+
+export default {
+	setup() {
+		let toast = useToast();
+		return { toast }
+	},
+	beforeMount() {
+		this.get_budgets();	
+	},
+	data() {
+		return {
+			"username": "",
+			"surname": "",
+			"name": "",
+			"password": "",
+			"password_repeat": ""
+		}
+	},
+	methods: {
+		get_budgets() {
+			if(this.$cookies.get('token') == null) {
+				this.toast.info("You are not logged in");
+				this.$router.push('/login');
+				return;
+			}
+		
+			var token = this.$cookies.get('token');
+			fetch('/api/user/', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + token
+				},
+			}).then(response => {
+				if (response.status == 403 || response.status == 405) {
+					this.toast.error("You are not authorized to view this profile");
+					this.$cookies.remove('token');
+					this.$router.push('/login');
+				}
+				else if(response.status == 200) {
+					response.json().then(data => {
+						console.log(data)
+						this.username = data.username;
+						this.surname = data.surname;
+						this.name = data.name;
+						this.password = "";
+						this.password_repeat = "";
+					});
+				}
+				else {
+					this.toast.error("Something went wrong");
+					this.$cookies.remove('token');
+					this.$router.push('/login');
+				}
+			});
+		},
+	}
+}
+</script>
+
 <style lang="scss">
     @use '@/styles/budget.scss'
 </style>

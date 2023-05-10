@@ -160,23 +160,22 @@ def get_user(user_id):
 
 	return jsonify(res_json), 200
 
-@user_blueprint.route('/<int:user_id>/budgets', methods=['GET'])
-def get_user_budgets(user_id):
+@user_blueprint.route('/budgets', methods=['GET'])
+@jwt_required()
+def get_current_user_budgets():
+	user_id = get_jwt_identity()
 	user = db.session.query(models.Users).filter_by(id=user_id).first()
 	
 	if user is None:
 		return jsonify({'error': 'User not found'}), 404
 
-	# if user != auth.current_user():
-	# 	return jsonify({'error': 'Forbidden'}), 403
-	
 	budgets_json = []
 	personal_budgets = db.session.query(models.PersonalBudgets).filter_by(id=user_id).all()
 	for personal_budget in personal_budgets:
 		budget_json = {}
 		budget_json['id'] = personal_budget.id
 		budget_json['money_amount'] = personal_budget.money_amount
-		budget_json['members'] = db.session.query(models.Users).filter_by(id=personal_budget.id).first().username
+		budget_json['members'] = [db.session.query(models.Users).filter_by(id=personal_budget.id).first().username]
 		budget_json['type'] = 'personal'
 		budgets_json.append(budget_json)
 		
@@ -189,6 +188,7 @@ def get_user_budgets(user_id):
 
 		budget_json['type'] = 'family'
 		budgets_json.append(budget_json)
+
 	return jsonify(budgets_json), 200
 
 @user_blueprint.route('/<int:user_id>', methods=['PATCH'])
