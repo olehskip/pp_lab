@@ -7,7 +7,7 @@ const routes = [
 		component: () => import('@/views/AllProfilesView.vue')
 	},
 	{
-		path: '/budget',
+		path: '/budget/:type/:id',
 		name: 'budget',
 		component: () => import('@/views/BudgetView.vue')
 	},
@@ -20,11 +20,6 @@ const routes = [
 		path: '/budget_report',
 		name: 'budget_report',
 		component: () => import('@/views/BudgetReportView.vue')
-	},
-	{
-		path: '/error',
-		name: 'error',
-		component: () => import('@/views/ErrorView.vue')
 	},
 	{
 		path: '/login',
@@ -46,7 +41,13 @@ const routes = [
 		path: '/transfer_money',
 		name: 'transfer_money',
 		component: () => import('@/views/TransferMoneyView.vue')
+	},
+	{
+		path: "/:catchAll(.*)",
+		name: "NotFound",
+		component: () => import('@/views/ErrorView.vue')
 	}
+	
 ]
 	
 const router = createRouter({

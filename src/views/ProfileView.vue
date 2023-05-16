@@ -130,13 +130,13 @@ export default {
 			};
 
 			fetch('/api/user/', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
 					'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify(data),
-            }).then(response => {
+				},
+				body: JSON.stringify(data),
+			}).then(response => {
 				if(response.status == 200) {
 					this.toast.success("Profile updated successfully");
 				}
@@ -148,16 +148,21 @@ export default {
 				else if(response.status == 409) {
 					this.toast.error("Username already exists");
 				}
+				else if(response.status == 401) {
+					this.toast.info("Session exprired");
+					this.$router.push('/login');
+					this.$cookies.remove('token');
+				}
 				else if(response.status == 400) {
 					response.json().then(response => {
-                        for (var key in response) {
+						for (var key in response) {
 							var val = response[key];
 							this.toast.error(key + ": " + val);
-                        }
-                    }).catch(error => {
-                        console.log(error);
-                        this.toast.error("Error");
-                    });
+						}
+					}).catch(error => {
+						console.log(error);
+						this.toast.error("Error");
+					});
 				}
 				else {
 					this.toast.error("Error updating profile");
@@ -169,28 +174,28 @@ export default {
 			this.$router.push('/login');
 		},
 		delete_account() {
-            var token = this.$cookies.get('token');
-            fetch('/api/user/', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
+			var token = this.$cookies.get('token');
+			fetch('/api/user/', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
 					'Authorization': 'Bearer ' + token
-                },
-            }).then(response => 
-            {
-                if(response.status == 200){
+				},
+			}).then(response => 
+			{
+				if(response.status == 200){
 					this.toast.warning("Profile deleted");
-                }
-                else {
-                    this.toast.error("Something went wrong");
-                }
-            }).catch(error => {
+				}
+				else {
+					this.toast.error("Something went wrong");
+				}
+			}).catch(error => {
 				console.log(error);
-                this.toast.error("Something went wrong");
-            });
+				this.toast.error("Something went wrong");
+			});
 			this.$cookies.remove('token');
 			this.$router.push('/login');
-        },
+		},
 	}
 }
 </script>

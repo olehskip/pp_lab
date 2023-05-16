@@ -1,5 +1,5 @@
 <template>
-    <div class="budgets-container">
+	<div class="budgets-container">
 		<div class="budgets-container-header">
 			<div class="caption">Your budgets</div>
 			<div class="buttons-container">
@@ -78,6 +78,11 @@ export default {
 						}
 					});
 				}
+				else if(response.status == 401) {
+					this.toast.info("Session exprired");
+					this.$router.push('/login');
+					this.$cookies.remove('token');
+				}
 				else {
 					this.toast.error("Something went wrong");
 					this.$cookies.remove('token');
@@ -90,5 +95,5 @@ export default {
 </script>
 
 <style lang="scss">
-    @use '@/styles/budgets.scss'
+	@use '@/styles/budgets.scss'
 </style>
