@@ -11,8 +11,18 @@ from flask_jwt_extended import (
 user_blueprint = Blueprint('user', __name__, url_prefix='/api/user')
 bcrypt = Bcrypt()
 	
-@user_blueprint.route('', methods=['GET'])
+@user_blueprint.route('/all', methods=['GET'])
+@jwt_required()
 def get_all_users():
+	user_id = get_jwt_identity()
+	user = db.session.query(models.Users).filter_by(id=user_id).first()
+
+	if user is None:
+		return jsonify({'error': 'User not found'}), 404
+
+	if not user.is_admin:
+		return jsonify({'error': 'Forbidden'}), 403
+	
 	users = db.session.query(models.Users).all()
 	res_json = []
 	for user in users:
@@ -21,9 +31,43 @@ def get_all_users():
 		res_json.append(user_json)
 	return jsonify(res_json), 200
 
+@user_blueprint.route('/all', methods=['DELETE'])
+@jwt_required()
+def delete_user():
+	user_id = get_jwt_identity()
+	user = db.session.query(models.Users).filter_by(id=user_id).first()
+
+	if user is None:
+		return jsonify({'error': 'User not found'}), 404
+
+	if not user.is_admin:
+		return jsonify({'error': 'Forbidden'}), 403
+
+	class User(Schema):
+		username = fields.Str(required=True)
+
+	try:
+		if not request.json:
+			raise ValidationError('No input data provided')
+		User().load(request.json)
+	except ValidationError as err:
+		return jsonify(err.messages), 400
+	
+	user_to_delete = db.session.query(models.Users).filter_by(username=request.json['username']).first()
+	if user_to_delete is None:
+		return jsonify({'error': 'User not found'}), 404
+	
+	if user_to_delete.is_admin:
+		return jsonify({'error': 'Forbidden'}), 403
+	
+	db.session.delete(user_to_delete)
+	db.session.commit()
+
+	return "", 204
+
+
 @user_blueprint.route('', methods=['POST'])
 def create_user():
-	print("received request", request.json)
 	class User(Schema):
 		surname = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
 		name = fields.Str(required=True, validate=[validate.Length(min=6, max=50)])
@@ -160,37 +204,6 @@ def get_user(user_id):
 
 	return jsonify(res_json), 200
 
-@user_blueprint.route('/budgets', methods=['GET'])
-@jwt_required()
-def get_current_user_budgets():
-	user_id = get_jwt_identity()
-	user = db.session.query(models.Users).filter_by(id=user_id).first()
-	
-	if user is None:
-		return jsonify({'error': 'User not found'}), 404
-
-	budgets_json = []
-	personal_budgets = db.session.query(models.PersonalBudgets).filter_by(id=user_id).all()
-	for personal_budget in personal_budgets:
-		budget_json = {}
-		budget_json['id'] = personal_budget.id
-		budget_json['money_amount'] = personal_budget.money_amount
-		budget_json['members'] = [db.session.query(models.Users).filter_by(id=personal_budget.id).first().username]
-		budget_json['type'] = 'personal'
-		budgets_json.append(budget_json)
-		
-	family_budgets = db.session.query(models.FamilyBudgets, models.FamilyBudgetsUsers).outerjoin(models.FamilyBudgetsUsers, models.FamilyBudgetsUsers.family_budget_id==models.FamilyBudgets.id,).filter(models.FamilyBudgetsUsers.user_id==user_id).all()
-	for family_budget, _ in family_budgets:
-		budget_json = {}
-		budget_json['id'] = family_budget.id
-		budget_json['money_amount'] = family_budget.money_amount
-		budget_json['members'] = [user.username for user, _ in db.session.query(models.Users, models.FamilyBudgetsUsers).outerjoin(models.FamilyBudgetsUsers, models.FamilyBudgetsUsers.user_id==models.Users.id,).filter(models.FamilyBudgetsUsers.family_budget_id==family_budget.id).all()]
-
-		budget_json['type'] = 'family'
-		budgets_json.append(budget_json)
-
-	return jsonify(budgets_json), 200
-
 @user_blueprint.route('/<int:user_id>', methods=['PATCH'])
 @auth.login_required
 def update_user(user_id):	
@@ -228,21 +241,21 @@ def update_user(user_id):
 
 	return "", 204
 	
-@user_blueprint.route('/<int:user_id>', methods=['DELETE'])
-@auth.login_required
-def delete_user(user_id):
-	user = db.session.query(models.Users).filter(models.Users.id == user_id).first()
+# @user_blueprint.route('/<int:user_id>', methods=['DELETE'])
+# @auth.login_required
+# def delete_user(user_id):
+# 	user = db.session.query(models.Users).filter(models.Users.id == user_id).first()
 	
-	if user is None:
-		return jsonify({'error': 'User does not exist'}), 404
+# 	if user is None:
+# 		return jsonify({'error': 'User does not exist'}), 404
 
-	if user != auth.current_user():
-		return jsonify({'error': 'Forbidden'}), 403
+# 	if user != auth.current_user():
+# 		return jsonify({'error': 'Forbidden'}), 403
 	
-	db.session.delete(user)	
-	db.session.commit()
+# 	db.session.delete(user)	
+# 	db.session.commit()
 
-	return "", 204
+# 	return "", 204
 
 @user_blueprint.route("/login", methods=["POST"])
 def login():
@@ -294,5 +307,8 @@ def register():
 	)
 	db.session.add(new_user_model)
 	db.session.commit()
-
+	
+	new_personal_budget = models.PersonalBudgets(id=new_user_model.id, money_amount=0)
+	db.session.add(new_personal_budget)
+	db.session.commit()
 	return login()

@@ -61,6 +61,20 @@ body {
 	}
 }
 
+.id-input {
+	background-color: transparent;
+	width: 100%;
+	border: 1px solid colors.$gray-color;
+	padding: 10px;
+	font-size: 16px;
+	border-radius: 5px;
+	box-shadow: none;
+	outline: none;
+	transition: all 0.3s ease-in-out;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+}
+
 .money-amount-selector {
 	background-color: transparent;
 	width: 100%;

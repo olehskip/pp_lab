@@ -52,7 +52,29 @@ bcrypt = Bcrypt()
 	
 	
 # 	return jsonify(familyBudget_json), 200
+
+#new family budget
+@family_budgets_blieprint.route('', methods=['POST'])
+@jwt_required()
+def create_new_familyBudget():
+	user_id = get_jwt_identity()
+	user = db.session.query(models.Users).filter_by(id=user_id).first()
+
+	if user is None:
+		return jsonify({'error': 'User not found'}), 404
 	
+	family_budget = models.FamilyBudgets(money_amount=0)
+	db.session.add(family_budget)
+	db.session.commit()
+
+	family_budget_user = models.FamilyBudgetsUsers(family_budget_id=family_budget.id, user_id=user_id)
+	db.session.add(family_budget_user)
+	db.session.commit()
+
+	data = {"family_budget_id": family_budget.id}
+
+	return jsonify(data), 200
+
 @family_budgets_blieprint.route('/<int:family_budget_id>', methods=['GET'])
 @jwt_required()
 def get_familyBudget(family_budget_id):
@@ -66,9 +88,11 @@ def get_familyBudget(family_budget_id):
 	if familyBudget is None:
 		return jsonify({'error': 'Budget not found'}), 404
 
-	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=models.FamilyBudgetsUsers.family_budget_id).all()]
+	members = [int(row.user_id) for row in db.session.query(models.FamilyBudgetsUsers).filter_by(family_budget_id=family_budget_id).all()]
 	if user_id not in members:
 		return jsonify({'error': 'You are not a member of this budget'}), 403
+	
+	print(members)
 
 	familyBudget_json = {}
 	familyBudget_json['members'] = []
@@ -183,7 +207,7 @@ def delete_familyBudget(family_budget_id):
 	if user_id not in members:
 		return jsonify({'error': 'You are not a member of this budget'}), 403
 
-	# db.session.delete(familyBudget)
+	db.session.delete(familyBudget)
 
 	db.session.commit()
 	return jsonify({'message': 'family budget deleted successfully'}), 200

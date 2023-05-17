@@ -3,7 +3,7 @@
 		<div class="info-header">
 			<div class="budget-info">Budget Information</div>
 			<div class="buttons-container">
-				<button class="show-report-button" id="show-report-button">Show Report</button>
+				<!-- <button class="show-report-button" id="show-report-button">Show Report</button> -->
 				<button class="transfer-money-button" id="transfer-money-button">Transfer money</button>
 				<button class="delete-button" v-if="budget_type=='family'" @click="delete_budget">Delete budget</button>
 			</div>

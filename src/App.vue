@@ -2,10 +2,9 @@
 	<header class="header" v-if="toShowHeader">
 		<nav>
 			<ul>
-				<li><router-link to="/">Home</router-link></li>
-				<li><router-link to="/profile">Profile</router-link></li>
-				<li><router-link to="/login">Login</router-link></li>
-				<li><router-link to="/register">Register</router-link></li>
+				<li><router-link to="/profile">Profile</router-link></li> |
+				<li><router-link to="/budgets">Budgets</router-link></li> |
+				<li><router-link to="/transfer_money">Transfer Money</router-link></li> |
 				<li><router-link to="/all_profiles">All profiles</router-link></li>
 			</ul>
 		</nav>
@@ -25,17 +24,5 @@ export default {
 
 <style lang="scss">
 	@use "@/styles/header.scss";
-	
-// nav {
-// 	padding: 30px;
 
-// 	a {
-// 		font-weight: bold;
-// 		color: #2c3e50;
-
-// 		&.router-link-exact-active {
-// 			color: #42b983;
-// 		}
-// 	}
-// }
 </style>

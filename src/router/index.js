@@ -12,7 +12,7 @@ const routes = [
 		component: () => import('@/views/BudgetView.vue')
 	},
 	{
-		path: '/budgets',
+		path: '/budgets/:id?',
 		name: 'budgets',
 		component: () => import('@/views/BudgetsView.vue')
 	},
