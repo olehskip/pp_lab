@@ -5,7 +5,7 @@
 			<div class="buttons-container">
 				<!-- <button class="show-report-button" id="show-report-button">Show Report</button> -->
 				<button class="transfer-money-button" id="transfer-money-button">Transfer money</button>
-				<button class="delete-button" v-if="budget_type=='family'" @click="delete_budget">Delete budget</button>
+				<button id="delete-button"  class="delete-button" @click="delete_budget">Delete budget</button>
 			</div>
 		</div>
 		<div class="item">
@@ -20,11 +20,11 @@
 			<label for="money">Money:</label>
 			<input type="text" id="money_amount" :value="budget_money + ' $'" readonly />
 		</div>
-		<div class="new-member-container" v-if="budget_type=='family'">
+		<div class="new-member-container">
 			<hr/>
 			<div class="new-member-header">
 				<div class="new-member-caption">Add a new member</div>
-				<button class="new-member-button" @click="add_new_member">Add a member</button>
+				<button id="new-member-button" class="new-member-button" @click="add_new_member">Add a member</button>
 			</div>
 			<input type="text" class="new-member-input" placeholder="Username" v-model="new_member_username"/>
 		</div>
@@ -74,15 +74,11 @@ export default {
 			}
 			var token = this.$cookies.get('token');
 			var budget_id = this.$route.params.id;
-			
-			var fetch_url = '';
+			var fetch_url = '/api/personal_budget/';
 			if (this.$route.params.type == 'family') {
 				fetch_url = '/api/family_budget/';
 			}
-			else if (this.$route.params.type == 'personal') {
-				fetch_url = '/api/personal_budget/';
-			}
-			else {
+			else if (this.$route.params.type != 'personal') {
 				this.toast.error("Not found");
 				this.$router.push('/');
 				return;
@@ -103,8 +99,8 @@ export default {
 							this.budget_members.push({username: member});
 						}
 					}).catch(error => {
-						console.log(error);
 						this.toast.error("Error");
+						this.$router.push('/');
 					});
 				}
 				else if(response.status == 403 || response.status == 405) {
@@ -117,11 +113,7 @@ export default {
 							var val = response[key];
 							this.toast.error(key + ": " + val);
 						}
-					}).catch(error => {
-						console.log(error);
-						this.toast.error("Error");
-						this.$
-					});
+					})
 				}
 				else if(response.status == 401) {
 					this.toast.info("Session exprired");
@@ -193,7 +185,6 @@ export default {
 				this.toast.error("Username can't be empty");
 				return;
 			}
-
 			var data = {
 				"username": username
 			}
@@ -223,7 +214,6 @@ export default {
 					response.json().then(response => {
 						this.toast.error(response.error);
 					}).catch(error => {
-						console.log(error);
 						this.toast.error("Error");
 					});
 				}
@@ -279,7 +269,6 @@ export default {
 					response.json().then(response => {
 						this.toast.error(response.error);
 					}).catch(error => {
-						console.log(error);
 						this.toast.error("Error");
 					});
 				}

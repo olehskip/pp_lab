@@ -17,11 +17,6 @@ const routes = [
 		component: () => import('@/views/BudgetsView.vue')
 	},
 	{
-		path: '/budget_report',
-		name: 'budget_report',
-		component: () => import('@/views/BudgetReportView.vue')
-	},
-	{
 		path: '/login',
 		name: 'login',
 		component: () => import('@/views/LoginView.vue')

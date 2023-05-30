@@ -3,15 +3,15 @@
         <form>
             <div class="form-header">Log in to have full access to your budgets</div>
             
-            <label for="username">Username</label>
-            <input id="username" name="username" v-model="username" required placeholder="Your username">
+            <label for="username_input">Username</label>
+            <input id="username_input" name="username_input" v-model="username" required placeholder="Your username">
             
-            <label for="password">Password</label>
-            <input type="password" id="password" v-model="password" name="password" placeholder = "Must have at least 6 characters" required>
+            <label for="password_input">Password</label>
+            <input type="password" id="password_input" v-model="password" name="password" placeholder = "Must have at least 6 characters" required>
             <div class="form-link">
                 <router-link to="/register">Don't have an account?</router-link>
             </div>
-            <button type="button" @click="send_login" class="form-submit-button">Log In</button>
+            <button type="button" @click="send_login" class="form-submit-button" id="form_button">Log In</button>
         </form>
         
         <div class="right-part"></div>
@@ -34,19 +34,17 @@ export default {
 	},
 	data() {
 		return {
-			"surname": "",
+			"username": "",
 			"password": ""
 		}
 	},
     methods: {
 		send_login() {
             var is_data_valid = true;
-            if(this.username.length == 0) {
-                this.toast.error("Username cannot be empty");
+            if(!this.username || this.username.length == 0) {
                 is_data_valid = false;
             }
-            if(this.password.length == 0) {
-                this.toast.error("Password cannot be empty");
+            if(this.password == null || this.password.length == 0) {
                 is_data_valid = false;
             }
             if(!is_data_valid) {
@@ -80,7 +78,6 @@ export default {
                         this.$router.push('/');
                     }).catch(error => 
                     {
-                        console.log(error);
                         this.toast.error("Error");
                     });
                 }
@@ -94,10 +91,9 @@ export default {
                     this.toast.error("Error");
                 }
             }).catch(error => {
-                console.log(error);
                 this.toast.error("Error");
             });
-		},
+		}
 	}
 }
 </script>

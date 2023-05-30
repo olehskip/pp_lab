@@ -105,7 +105,6 @@ export default {
                             this.toast.error(key + ": " + val);
                         }
                     }).catch(error => {
-                        console.log(error);
                         this.toast.error("Error");
                     });
                 }
@@ -115,12 +114,10 @@ export default {
                         this.$cookies.set('token', response.token, '15min');
                         this.$router.push('/');
                     }).catch(error => {
-                        console.log(error);
                         this.toast.error("Error");
                     });
                 }
             }).catch(error => {
-                console.log(error);
                 this.toast.error("Error");
             });
 		},

@@ -5,7 +5,8 @@
         <div class="form-group">
             <label for="from-budget">From Budget</label>
             <select id="from-budget" name="from-budget" class="budget-selector" v-model="first_budget_type" >
-                <option value="personal" selected>Personal</option>
+                <option value="" disabled selected hidden>Budget type</option>
+                <option value="personal">Personal</option>
                 <option value="family">Family</option>
             </select>
             <input type="number" class="money-amount-selector" id="amount" name="amount" min="0" step="1" placeholder="0" v-model="first_budget_id">
@@ -13,7 +14,8 @@
         <div class="form-group">
             <label for="to-budget">To Budget</label>
             <select id="from-budget" name="from-budget" class="budget-selector" v-model="second_budget_type">
-                <option value="personal" selected>Personal</option>
+                <option value="" disabled selected hidden>Budget type</option>
+                <option value="personal">Personal</option>
                 <option value="family">Family</option>
             </select>
             <input type="number" class="money-amount-selector" id="amount" name="amount" min="0" step="1" placeholder="0" v-model="second_budget_id">
