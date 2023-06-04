@@ -1,0 +1,96 @@
+@use "colors.scss";
+@use "buttons.scss";
+@use "inputs.scss";
+
+%simple-form-container {
+	margin: 0 auto;
+	padding: 50px;
+	background-color: colors.$content-background-color;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	font-family: Arial, sans-serif;
+}
+
+%simple-caption {
+	text-align: center;
+	margin-bottom: 20px;
+	color: colors.$form-caption-color;
+	font-size: 30px;
+	font-weight: 700;
+}
+
+%form-with-image-container {
+	display: flex;
+	height: 100vh;
+	
+	form {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 30%;
+		min-width: 300px;
+		@media (max-width: 700px) {
+			width: 100%;
+			min-width: 0;
+		}
+		padding: 40px;
+		background-color: colors.$content-background-color;
+		border: none;
+		border-right: 1px solid colors.$white-color;
+	}
+	.right-part {
+		@media (max-width: 700px) {
+			width: 0%;
+		}
+		min-width: 0;
+		width: 70%;
+		
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+	
+	.form-header {
+		@extend %simple-caption;
+	}
+	
+	label {
+		font-size: 20px;
+		font-weight: 400;
+		margin-bottom: 5px;
+	}
+	
+	input {
+		width: 100%;
+		padding: 8px;
+		margin-bottom: 20px;
+		font-size: 1rem;
+		border: 1px solid colors.$gray-color;
+		border-radius: 3px;
+	}
+	
+	.form-link {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		margin-bottom: 17px;
+		font-size: 1rem;
+		color: colors.$azure-button-color;
+		text-decoration: none;
+		transition: all 0.2s ease-in-out;
+	}
+	
+	.form-link:hover {
+		text-decoration: underline;
+	}
+
+	button {
+		@extend %simple-button;
+	}
+
+	.form-submit-button {
+		background-color: colors.$green-button-color;
+	}
+}

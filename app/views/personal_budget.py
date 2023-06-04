@@ -7,30 +7,39 @@ import app.db as db
 from flask_bcrypt import Bcrypt
 from app.auth import auth
 from sqlalchemy import or_
+from flask_jwt_extended import (
+	jwt_required, get_jwt_identity
+)
 
-personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/personal_budget')
+personal_budgets_blieprint = Blueprint('PersonalBudgets', __name__, url_prefix='/api/personal_budget')
 bcrypt = Bcrypt()
 
-def from_personal_model_to_json(personal_budget: models.PersonalBudgets):
-	personal_budgets_json = {}
-	
-	personal_budgets_json['id'] = personal_budget.id
-	personal_budgets_json['money_amount'] = personal_budget.money_amount
-		
-	return jsonify(personal_budgets_json)
-
 @personal_budgets_blieprint.route('/<int:personal_budget_id>', methods=['GET'])
-@auth.login_required
+@jwt_required()
 def get_personal_budget(personal_budget_id):
-	if personal_budget_id != auth.current_user().id:
+	print("called")
+	user_id = get_jwt_identity()
+	print("user_id", user_id)
+	user = db.session.query(models.Users).filter_by(id=user_id).first()
+	
+	if user is None:
+		return jsonify({'error': 'User not found'}), 404
+
+	if personal_budget_id != user_id:
 		return jsonify({'error': 'Forbidden'}), 403
 	
 	personal_budget = db.session.query(models.PersonalBudgets).filter_by(id=personal_budget_id).first()
 
-	return from_personal_model_to_json(personal_budget), 200
-	
+	personal_budget_json = {}
+	personal_budget_json['id'] = personal_budget.id
+	personal_budget_json['members'] = [user.username]
+	personal_budget_json['money'] = personal_budget.money_amount
+	personal_budget_json['type'] = 'personal'
+		
+	return jsonify(personal_budget_json), 200
+
 @personal_budgets_blieprint.route('/<int:personal_budget_id>/report', methods=['GET'])
-@auth.login_required
+@jwt_required()
 def get_personal_budget_report(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
 		return jsonify({'error': 'Forbidden'}), 403
@@ -55,7 +64,7 @@ def get_personal_budget_report(personal_budget_id):
 	return jsonify(report_json), 200
 	
 @personal_budgets_blieprint.route('/<int:personal_budget_id>/transfer', methods=['POST'])
-@auth.login_required
+@jwt_required()
 def post_personal_budget_transfer(personal_budget_id):
 	if personal_budget_id != auth.current_user().id:
 		return jsonify({'error': 'Forbidden'}), 403

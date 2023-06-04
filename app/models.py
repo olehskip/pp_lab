@@ -16,6 +16,7 @@ class Users(Base):
     name = Column(String(40), nullable=False)
     username = Column(String(40), nullable=False, unique=True)
     password = Column(String(256), nullable=False)
+    is_admin = Column(Boolean, nullable=True, default=False)
     personalBudget_child = relationship("PersonalBudgets", cascade="all,delete", backref="personalBudget_parent_user")
     familyBudgetUsers_child = relationship("FamilyBudgetsUsers", cascade="all,delete", backref="familyBudgetUsers_parent_user")
 
